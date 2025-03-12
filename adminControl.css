@@ -42,87 +42,52 @@ body {
 .container {
   max-width: 1200px;
   margin: 20px auto;
-  padding: 0 20px;
+  padding: 0 15px;
 }
 
-/* Heading */
-h1 {
+/* Headings */
+h1,
+h2,
+h3 {
   text-align: center;
   color: #ffa500;
   margin-bottom: 20px;
 }
 
-/* Search & Refresh Section */
-.search-refresh {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
+/* Section Styling */
+section {
+  margin-bottom: 40px;
+  background-color: #fff;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Form Styling */
+form {
   margin-bottom: 20px;
 }
-.search-form input[type="text"] {
+form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+form input[type="text"],
+form input[type="email"],
+form input[type="password"],
+form textarea,
+form select {
+  width: 100%;
   padding: 8px;
-  width: 250px;
+  margin-top: 5px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
-.search-form button,
-.search-refresh button {
-  padding: 8px 16px;
-  background-color: #ffa500;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.search-form button:hover,
-.search-refresh button:hover {
-  background-color: #e69500;
-}
-
-/* Payments Table */
-.payments-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-.payments-table th,
-.payments-table td {
-  border: 1px solid #ccc;
-  padding: 12px 10px;
-  text-align: left;
-  vertical-align: middle;
-  word-wrap: break-word;
-  white-space: normal;
-}
-.payments-table th {
-  background-color: #ffa500;
-  color: #fff;
-}
-
-/* Inputs */
-.amount-input {
-  width: 100%;
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.notes-input {
-  width: 100%;
-  height: 80px; /* Increase height for multi-line input */
-  padding: 6px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+form textarea {
   resize: vertical;
 }
-
-/* Form Actions */
-.form-actions {
-  text-align: center;
-  margin-top: 20px;
-}
-.form-actions button {
+form button {
+  margin-top: 15px;
   padding: 10px 20px;
   background-color: #ffa500;
   color: #fff;
@@ -131,8 +96,80 @@ h1 {
   cursor: pointer;
   transition: background-color 0.3s;
 }
-.form-actions button:hover {
+form button:hover {
   background-color: #e69500;
+}
+
+/* User Forms and Tables */
+.user-forms,
+.client-forms {
+  margin-bottom: 30px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+table th,
+table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+table th {
+  background-color: #ffa500;
+  color: #fff;
+}
+
+/* Delete Button */
+.delete-btn {
+  display: inline-block;
+  padding: 6px 12px;
+  background-color: #cc0000;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+.delete-btn:hover {
+  background-color: #990000;
+}
+
+/* Active Users Section */
+.active-users-section {
+  margin-top: 20px;
+}
+.active-users-section table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.active-users-section th,
+.active-users-section td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+.active-users-section th {
+  background-color: #ffa500;
+  color: #fff;
+}
+
+/* System Log Section */
+.system-log table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+.system-log th,
+.system-log td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+.system-log th {
+  background-color: #ffa500;
+  color: #fff;
 }
 
 /* Footer */

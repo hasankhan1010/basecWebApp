@@ -50,18 +50,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $clientID      = $data['clientID'] ?? 0;
             $paymentDateTime = date("Y-m-d H:i:s"); // Current time on update
 
-            // Check if a payment record exists for this job
+            // Check if a payment record exists for this job.
             $check = $conn->prepare("SELECT paymentID FROM Payments WHERE invoiceReference = ?");
             $check->bind_param("i", $jobID);
             $check->execute();
             $check->store_result();
 
             if ($check->num_rows > 0) {
-                // Update existing payment
+                // Update existing payment.
                 $check->bind_result($paymentID);
                 $check->fetch();
                 $check->close();
-
                 $upd = $conn->prepare("UPDATE Payments 
                                        SET paymentAmount=?, paymentIsPaid=?, paymentNotes=?, paymentDateTime=? 
                                        WHERE paymentID = ?");
@@ -69,8 +68,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $upd->execute();
                 $upd->close();
             } else {
-                // Insert new payment
                 $check->close();
+                // Insert new payment record.
                 $ins = $conn->prepare("INSERT INTO Payments (clientID, invoiceReference, paymentAmount, paymentIsPaid, paymentNotes) 
                                        VALUES (?, ?, ?, ?, ?)");
                 $ins->bind_param("iidsi", $clientID, $jobID, $paymentAmount, $paymentIsPaid, $paymentNotes);
@@ -164,8 +163,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </select>
               </td>
               <td>
-                <input type="text" name="payments[<?php echo $jobID; ?>][paymentNotes]" 
-                       value="<?php echo htmlspecialchars($paymentNotes); ?>" class="notes-input">
+                <textarea name="payments[<?php echo $jobID; ?>][paymentNotes]" class="notes-input"><?php echo htmlspecialchars($paymentNotes); ?></textarea>
               </td>
               <!-- Hidden field for clientID -->
               <input type="hidden" name="payments[<?php echo $jobID; ?>][clientID]" value="<?php echo $clientID; ?>">
