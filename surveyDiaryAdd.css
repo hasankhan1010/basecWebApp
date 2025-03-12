@@ -1,0 +1,99 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body & Overall Styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0ead6; /* Eggshell white */
+  color: #333;
+}
+
+/* Navigation Bar */
+.navbar {
+  background-color: #ffa500; /* Orange */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+.navbar .nav-left a,
+.navbar .nav-right a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  margin-right: 10px;
+}
+.navbar .nav-left a.active,
+.navbar .nav-left a:hover,
+.navbar .nav-right a:hover {
+  background-color: #e69500;
+  border-radius: 4px;
+}
+
+/* Form Container */
+.form-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ffa500;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-container h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffa500;
+}
+
+/* Form Styles */
+.form-container form {
+  display: flex;
+  flex-direction: column;
+}
+.form-container label {
+  margin-top: 10px;
+  font-weight: bold;
+}
+.form-container input[type="date"],
+.form-container input[type="time"],
+.form-container input[type="text"],
+.form-container textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.form-container textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.form-container button {
+  margin-top: 20px;
+  padding: 12px;
+  background-color: #ffa500;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+.form-container button:hover {
+  background-color: #e69500;
+}
+
+/* Footer */
+footer {
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}

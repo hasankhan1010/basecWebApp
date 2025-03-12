@@ -1,0 +1,85 @@
+/* Overall Page Styles */
+body {
+  background-color: #f0ead6; /* Eggshell white */
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header Styling */
+header {
+  background-color: #ffa500; /* Orange */
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Main Content Styling */
+main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+
+/* Login Container */
+.login-container {
+  background-color: #fff;
+  border: 2px solid #ffa500;
+  border-radius: 10px;
+  padding: 30px;
+  max-width: 350px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-container h2 {
+  text-align: center;
+  color: #ffa500;
+  margin-bottom: 20px;
+}
+
+.login-container label {
+  display: block;
+  margin-top: 10px;
+  color: #333;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background-color: #ffa500;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.login-container button:hover {
+  background-color: #e69500;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Footer Styling */
+footer {
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 15px 0;
+  border-top: 1px solid #ddd;
+}

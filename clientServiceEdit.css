@@ -1,0 +1,185 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Base Body Styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0ead6; /* Eggshell white */
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Navigation Bar */
+.navbar {
+  background-color: #ffa500; /* Orange */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+.navbar .nav-left a,
+.navbar .nav-right a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  margin-right: 10px;
+}
+
+.navbar .nav-left a:hover,
+.navbar .nav-right a:hover {
+  background-color: #e69500;
+  border-radius: 4px;
+}
+
+.navbar .nav-left a.active {
+  background-color: #e69500;
+  border-radius: 4px;
+}
+
+/* Container */
+.container {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 15px;
+}
+
+/* Headings */
+h1 {
+  text-align: center;
+  color: #ffa500;
+  margin-bottom: 20px;
+}
+
+/* Fieldset Styling */
+fieldset {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+legend {
+  padding: 0 10px;
+  font-weight: bold;
+  color: #ffa500;
+}
+
+/* Form Rows */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.form-row label {
+  flex: 0 0 150px;
+  padding-right: 10px;
+  font-weight: bold;
+}
+
+.form-row input,
+.form-row textarea {
+  flex: 1 0 300px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 5px;
+  min-width: 0; /* so it can shrink if needed */
+}
+
+textarea {
+  resize: vertical;
+}
+
+/* Job History Table */
+.table-responsive {
+  overflow-x: auto; /* Horizontal scroll if table is too wide */
+}
+
+table {
+  width: 100%;
+  table-layout: fixed; /* Allows word-wrap in columns */
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  vertical-align: top;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+th {
+  background-color: #ffa500;
+  color: #fff;
+}
+
+/* Form Actions */
+.form-actions {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  padding: 10px 20px;
+  background-color: #ffa500;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.form-actions button:hover {
+  background-color: #e69500;
+}
+
+/* Client Files Section */
+.client-files {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.client-files h3 {
+  color: #ffa500;
+  margin-bottom: 10px;
+}
+
+.client-files ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 10px;
+}
+
+.client-files ul li {
+  margin-bottom: 5px;
+}
+
+.client-files form {
+  margin-top: 10px;
+}
+
+.client-files input[type="file"] {
+  margin-bottom: 10px;
+}
+
+/* Footer */
+footer {
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+}
