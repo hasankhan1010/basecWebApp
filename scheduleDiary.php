@@ -2,7 +2,7 @@
 session_start();
 
 if (!isset($_SESSION['user'])) {
-    header("Location: home.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -127,7 +127,7 @@ $stmt->close();
             <a href="payments.php">Payments</a>
         </div>
         <div class="nav-right">
-            <a href="home.php">Logout</a>
+            <a href="logout.php">Logout</a>
         </div>
     </nav>
     

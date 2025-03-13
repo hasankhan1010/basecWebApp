@@ -1,6 +1,6 @@
 <?php
-// TAKES USER TO THE HOME.PHP - 
+// TAKES USER TO THE INDEX.PHP - 
 session_start();
 session_destroy();
-header("Location: home.php");
+header("Location: index.php");
 exit();

@@ -48,7 +48,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getUser') {
 
 // NOT LOGGED IN - THEN RETURN TO HOME
 if (!isset($_SESSION['user'])) {
-    header("Location: home.php");
+    header("Location: index.php");
     exit();
 }
 ?>

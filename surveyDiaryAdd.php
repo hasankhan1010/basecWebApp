@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['user'])) {
-    header("Location: home.php");
+    header("Location: index.php");
     exit();
 }
 
@@ -90,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <a href="payments.php">Payments</a>
         </div>
         <div class="nav-right">
-            <a href="home.php">Logout</a>
+            <a href="logout.php">Logout</a>
         </div>
     </nav>
     
