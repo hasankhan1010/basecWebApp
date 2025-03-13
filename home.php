@@ -1,13 +1,13 @@
 <?php
 session_start();
 
-// If already logged in, redirect to portal
+// SEND TO PORTAL IG LOGGED IN
 if (isset($_SESSION['user'])) {
     header("Location: portal.php");
     exit();
 }
 
-// Include database connection
+// DB CONNECTION CONNECT 
 include('database.php');
 
 $error = '';
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // Define queries for each role
+    // EACH ROLE QUERYING
     $roles = [
         'engineer' => "SELECT * FROM Engineer WHERE engineerUsername = ? AND engineerPassword = ?",
         'admin'    => "SELECT * FROM Administrator WHERE adminUsername = ? AND adminPassword = ?",
@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'sales'    => "SELECT * FROM SalesTeam WHERE salesUsername = ? AND salesPassword = ?"
     ];
 
-    // Check if we have a valid connection
+    // CONNECTION CHECKING - SEND TO PORTAL.PHP
     if ($conn) {
         foreach ($roles as $role => $query) {
             $stmt = $conn->prepare($query);
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $result = $stmt->get_result();
 
                 if ($result && $result->num_rows > 0) {
-                    // Valid user found
+                    // THEN THE VALID CREDENTIAL IS VALID
                     $_SESSION['user'] = $result->fetch_assoc();
                     $_SESSION['role'] = $role;
                     header("Location: portal.php");
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // If no match found or connection invalid, show generic error
+    // SIMPLE ERROR STATEMENT
     $error = 'Invalid login credentials';
 }
 ?>

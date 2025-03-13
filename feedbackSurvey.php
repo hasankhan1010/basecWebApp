@@ -1,13 +1,13 @@
 <?php
 include('database.php'); 
 
-// Validate job ID
+// VALIDATE THE JOB ID - EACH IS UNIQUE
 if (!isset($_GET['jobID']) || !is_numeric($_GET['jobID'])) {
     die("Invalid job reference.");
 }
 $jobID = intval($_GET['jobID']);
 
-// Check if feedback already exists for this job
+// CHECKING IF FEEDBACK ALREADY EXITS.......
 $stmt = $conn->prepare("SELECT * FROM Feedback WHERE feedbackID = ?");
 $stmt->bind_param("i", $jobID);
 $stmt->execute();
@@ -15,17 +15,17 @@ $result = $stmt->get_result();
 $existingFeedback = $result->fetch_assoc();
 $stmt->close();
 
-// Handle feedback submission
+// FEEDBACK SUBMISSION HANDLING 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $rating = $_POST['rating'] ?? '';
     $comments = $_POST['comments'] ?? '';
 
     if ($existingFeedback) {
-        // Update existing feedback
+        // UPDFATE THE EXISTING FEEDBACK
         $stmt = $conn->prepare("UPDATE Feedback SET feedbackRating = ?, feedbackComments = ?, feedbackRecievedDateTime = NOW() WHERE feedbackID = ?");
         $stmt->bind_param("ssi", $rating, $comments, $jobID);
     } else {
-        // Insert new feedback
+        // INSERT NEW FEEDBACK
         $stmt = $conn->prepare("INSERT INTO Feedback (feedbackID, clientID, feedbackRating, feedbackComments, feedbackRecievedDateTime) VALUES (?, (SELECT clientID FROM ScheduleDiary WHERE scheduleID = ?), ?, ?, NOW())");
         $stmt->bind_param("iiss", $jobID, $jobID, $rating, $comments);
     }

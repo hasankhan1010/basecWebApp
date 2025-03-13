@@ -6,19 +6,19 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// Ensure clientID is provided
+// MAKE SURE CLIENT ID IS PROVIDED 
 if (!isset($_GET['clientID'])) {
     echo "No client specified.";
     exit();
 }
 $clientID = intval($_GET['clientID']);
 
-// Initialize arrays
+// START THE ARRAYS 
 $client = [];
 $jobs   = [];
 $files  = [];
 
-// Retrieve client details
+// GET ALL THE CLIENT DETAILS 
 $stmt = $conn->prepare("SELECT * FROM Clients WHERE clientID = ?");
 $stmt->bind_param("i", $clientID);
 $stmt->execute();
@@ -26,7 +26,7 @@ $result = $stmt->get_result();
 $client = $result->fetch_assoc() ?? [];
 $stmt->close();
 
-// Retrieve job history from ScheduleDiary
+// GET THE JOB HISTORY FROM SCHEDULE DIARY::::::::::::::
 $stmt = $conn->prepare("SELECT * FROM ScheduleDiary WHERE clientID = ? ORDER BY scheduleDate DESC");
 $stmt->bind_param("i", $clientID);
 $stmt->execute();
@@ -36,7 +36,7 @@ while ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Retrieve client files (if table exists)
+// IF TABLE EXISTS, GET THE CLIENT FILESSSS
 $tableCheck = $conn->query("SHOW TABLES LIKE 'ClientFiles'");
 if ($tableCheck && $tableCheck->num_rows > 0) {
     $stmt = $conn->prepare("SELECT * FROM ClientFiles WHERE clientID = ? ORDER BY fileDateTime DESC");
@@ -51,9 +51,9 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     }
 }
 
-// Process form submission
+// PROCESS THE FORM SUBMISSION
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Update client details
+    // UPDATE THE CLIENT DETAILS 
     $clientFirstName = $_POST['clientFirstName'] ?? null;
     $clientLastName  = $_POST['clientLastName'] ?? null;
     $clientAddress1  = $_POST['clientAddress1'] ?? null;
@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->execute();
     $stmt->close();
     
-    // Update each job record in ScheduleDiary
+    // UPDATE EACH JOB RECORD IN SCHEDULE DIARY
     if (isset($_POST['jobs']) && is_array($_POST['jobs'])) {
         foreach ($_POST['jobs'] as $job) {
             $scheduleID     = intval($job['scheduleID']);
@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="clientServiceEdit.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
+ 
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>
@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="container">
         <h1>Edit Client Services</h1>
         
-        <!-- Client Details Section -->
+        <!-- CLIENT DETAILS SECTIONN -->
         <form method="post" action="clientServiceEdit.php?clientID=<?php echo $clientID; ?>">
             <fieldset class="client-details">
                 <legend>Client Details</legend>
@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </fieldset>
             
-            <!-- Job History Section (Schedule Diary) -->
+            <!-- JOB HISTORY SECTION -->
             <fieldset class="job-history">
                 <legend>Job History (Schedule Diary)</legend>
                 <?php if (!empty($jobs)): ?>
@@ -203,7 +203,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </form>
         
-        <!-- Files Section -->
+        <!-- FILES SECTION::::::::::::::::::::::: -->
         <fieldset class="client-files">
             <legend>Client Files</legend>
             <?php if (!empty($files)): ?>

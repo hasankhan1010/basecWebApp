@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Verify a user is logged in; otherwise, redirect to home.php
+// USER VERIFY
 if (!isset($_SESSION['user'])) {
     header("Location: home.php");
     exit();
@@ -9,10 +9,10 @@ if (!isset($_SESSION['user'])) {
 
 include('database.php');
 
-// Determine week offset (0 = current week); allows viewing past and future weeks.
+// FIND OUT CURRENT WEEK - ALSO ALLOWING PAST AND FUTURE WEEKS 
 $weekOffset = isset($_GET['week']) ? intval($_GET['week']) : 0;
 
-// Calculate Monday for the current week, then adjust by offset.
+// CALCULATE MONDAY - ADJUST IT THO AS OFFSETS EXIST
 $monday = new DateTime();
 $monday->modify('Monday this week');
 if ($weekOffset !== 0) {
@@ -24,14 +24,14 @@ if ($weekOffset !== 0) {
     }
 }
 
-// Calculate Sunday (6 days after Monday)
+// 6DAYS AFTER MONDAY IS SUNDAY - CALCULATE USING THIS 
 $sunday = clone $monday;
 $sunday->modify('+6 days');
 
 $startDate = $monday->format('Y-m-d');
 $endDate   = $sunday->format('Y-m-d');
 
-// Retrieve survey diary entries for the week using a prepared statement
+//  RETRIEVE THE ENTRIES, FOR THE WHOLE WEEK USING A PREPARED STATEMENT
 $query = "SELECT * FROM SurveyDiary WHERE surveyDate BETWEEN ? AND ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ss", $startDate, $endDate);
@@ -40,7 +40,7 @@ $result = $stmt->get_result();
 
 $surveys = [];
 while ($row = $result->fetch_assoc()) {
-    // Composite key: date_hour (e.g., "2025-03-04_08")
+    // COMPOSITE KEY: DATE_HOUR (LIKE 2205-01-01_08)
     $key = $row['surveyDate'] . '_' . substr($row['surveyTime'], 0, 2);
     if (!isset($surveys[$key])) {
         $surveys[$key] = [];
@@ -56,12 +56,12 @@ $stmt->close();
     <title>Survey Diary</title>
     <link rel="stylesheet" href="surveyDiary.css">
     <script>
-      // Wait for the DOM to load before attaching events
+      // MUST WAIT FOR DOM TO LOAD BEFORE ATTACHING EVENTS 
       document.addEventListener("DOMContentLoaded", function() {
           var modal = document.getElementById("slotModal");
           var modalClose = document.querySelector(".modal-close");
 
-          // Attach click event to every timeslot cell
+          // A CLICK EVENT ATTACH FOR EVERY TIME SLOT
           var cells = document.getElementsByClassName("timeslot");
           Array.from(cells).forEach(function(cell) {
               cell.addEventListener("click", function() {
@@ -81,7 +81,7 @@ $stmt->close();
                   }
                   document.getElementById("modalBody").innerHTML = content;
                   
-                  // Set the Edit button URL with the date and hour from the key
+                  // MAKE SURE EDIT BUTTON URL IS MATCHING WITH DATE 
                   var parts = key.split("_");
                   var datePart = parts[0];
                   var hourPart = parts[1];
@@ -91,12 +91,12 @@ $stmt->close();
               });
           });
 
-          // Close the modal when the close icon is clicked
+          // CLOSE MODAL WITH CLOSE ICON - MAKE SURE IT WORKS 
           modalClose.onclick = function() {
               modal.style.display = "none";
           };
 
-          // Close modal when clicking outside the modal content
+          // ALSO CLOSE MODAL WHEN CLICKED OUTSIDE MODAL CONTENT 
           window.onclick = function(event) {
               if (event.target == modal) {
                   modal.style.display = "none";
@@ -106,7 +106,7 @@ $stmt->close();
     </script>
 </head>
 <body>
-    <!-- Navigation Bar -->
+    <!-- NAV BAR HAS BEEN MADE!!!!!!!!!!  -->
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>
@@ -136,13 +136,13 @@ $stmt->close();
             </div>
         </header>
         
-        <!-- Weekly Timetable -->
+        <!-- WEEKLY TIMETABLEEEEE -->
         <table class="timetable">
             <thead>
                 <tr>
                     <th>Time</th>
                     <?php
-                        // Build table headers for Monday to Sunday
+                        // TABLE HEADERS - BUILD IT - MON-FRI 
                         $days = [];
                         for ($i = 0; $i < 7; $i++) {
                             $day = clone $monday;
@@ -155,7 +155,7 @@ $stmt->close();
             </thead>
             <tbody>
                 <?php
-                    // Create one-hour slots from 8 AM to 6 PM
+                    // SLOT TIMES FROM 8AM-6PM 
                     for ($hour = 8; $hour < 18; $hour++) {
                         echo "<tr>";
                         echo "<td>" . sprintf("%02d:00 - %02d:00", $hour, $hour + 1) . "</td>";
@@ -165,7 +165,7 @@ $stmt->close();
                             echo "<td class='timeslot' data-key='$key'>";
                             if (isset($surveys[$key])) {
                                 foreach ($surveys[$key] as $survey) {
-                                    // Truncate notes to 50 characters for presentation
+                                    // PRESENTATION WISE - TRUNCATE THE NOTES TO 50CHAARCTERS - TRY 100 THEN 50
                                     $notes = htmlspecialchars($survey['surveyNotes']);
                                     if (strlen($notes) > 50) {
                                         $notes = substr($notes, 0, 50) . '...';
@@ -188,19 +188,19 @@ $stmt->close();
         </table>
     </div>
     
-    <!-- Modal Pop-up for Survey Slot Details -->
+    <!-- MODAL POP-UP - SURVEY SLOT DETAILS -->
     <div id="slotModal" class="modal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <h2>Survey Details</h2>
             <div id="modalBody">
-                <!-- Details will be dynamically inserted here -->
+                <!-- DETAILS WILL DYNAMICALLY BE INSERTED -->
             </div>
             <a id="editButton" class="edit-btn" href="surveyDiaryAdd.php">Edit / Add Entry</a>
         </div>
     </div>
     
-    <!-- Pass PHP survey data to JavaScript -->
+    <!-- PHP DATA SURVEY DATA TO JAVASCRIPT --> 
     <script>
       var surveyData = <?php echo json_encode($surveys); ?>;
     </script>

@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 include('database.php');
 
 /*
-  Expected columns in ScheduleDiary:
+  THESE ARE THE EXPECTED COLUMNS IN SCHEDULE DIARY:::::
     scheduleID (INT, PK)
     scheduleDate (DATE)
     scheduleStartTime (TIME)
@@ -22,7 +22,7 @@ include('database.php');
     scheduleNotes (TEXT/VARCHAR)
 */
 
-// Load list of valid engineers for the dropdown
+// LOAD THE LSIT OF VALID ENGINEERS IN A DROP-DOWN
 $engineers = [];
 $engQuery = "SELECT engineerID, engineerFirstName, engineerLastName FROM Engineer";
 $engResult = mysqli_query($conn, $engQuery);
@@ -32,7 +32,7 @@ if ($engResult) {
     }
 }
 
-// Load list of valid clients for the dropdown
+// THE SAME BUT WITH THE CLIENTS 
 $clients = [];
 $clientQuery = "SELECT clientID, clientFirstName, clientLastName FROM Clients";
 $clientResult = mysqli_query($conn, $clientQuery);
@@ -42,7 +42,7 @@ if ($clientResult) {
     }
 }
 
-// Initialize variables
+// THE VAIRABLES - INITLIAZE
 $scheduleID              = isset($_GET['scheduleID']) ? intval($_GET['scheduleID']) : 0;
 $scheduleDate            = "";
 $scheduleStartTime       = "";
@@ -50,24 +50,24 @@ $scheduleEndTime         = "";
 $engineerID              = "";
 $clientID                = "";
 $scheduleJobType         = "";
-$scheduleIsAnnualService = 0; // 0 = false, 1 = true
+$scheduleIsAnnualService = 0; // 0 = FALSE, 1 = TRUE !!!
 $scheduleStatus          = "";
 $scheduleDetails         = "";
 $scheduleNotes           = "";
 
-// If creating a new entry, pre-fill from clicked slot (GET params)
+// PRE-FILL FROM CLICKED SLOT IF CREATING A NEW ENTRY
 if (isset($_GET['date'])) {
     $scheduleDate = $_GET['date'];
 }
 if (isset($_GET['hour'])) {
-    // Convert the clicked hour into a valid "HH:00:00" string
+  
     $clickedHour = intval($_GET['hour']);
     if ($clickedHour >= 0 && $clickedHour < 24) {
         $scheduleStartTime = str_pad($clickedHour, 2, '0', STR_PAD_LEFT) . ":00:00";
     }
 }
 
-// If editing an existing entry, load its values from the DB (overriding any GET pre-fill)
+//  IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERIRDE ANY GET PRE-FILLS)
 if ($scheduleID > 0 && $conn) {
     $query = "SELECT * FROM ScheduleDiary WHERE scheduleID = ?";
     $stmt  = $conn->prepare($query);
@@ -89,7 +89,7 @@ if ($scheduleID > 0 && $conn) {
     $stmt->close();
 }
 
-// Process form submission
+// THE PROCESS FORM SUBMISSION -
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleID              = isset($_POST['scheduleID']) ? intval($_POST['scheduleID']) : 0;
     $scheduleDate            = $_POST['scheduleDate'];
@@ -103,11 +103,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleDetails         = $_POST['scheduleDetails'];
     $scheduleNotes           = $_POST['scheduleNotes'];
     
-    // Placeholder for file handling (no logic yet)
+    // THIS IS A PLACEHOLDER FOR FILE HANDLING - SORT THIS OUT ASAP
     // $file = $_FILES['scheduleFile'] ?? null;
     
     if ($scheduleID > 0) {
-        // UPDATE existing record (11 placeholders)
+        // UPDATE THE EXISING RECORD - 11 PLACEHOLDERS!!!!!!
         $query = "UPDATE ScheduleDiary
                   SET scheduleDate = ?,
                       scheduleStartTime = ?,
@@ -138,7 +138,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $stmt->close();
     } else {
-        // INSERT new record (10 placeholders)
+        // INSERT NEW RECORD - 1- PLACEHOLDERSSSSSS
         $query = "INSERT INTO ScheduleDiary (
                     scheduleDate,
                     scheduleStartTime,
@@ -180,7 +180,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="scheduleDiaryAdd.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
+   
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>
@@ -249,7 +249,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <label for="scheduleNotes">Notes:</label>
             <textarea id="scheduleNotes" name="scheduleNotes"><?php echo htmlspecialchars($scheduleNotes); ?></textarea>
             
-            <!-- Placeholder for file upload -->
+            <!-- THE PLACEHOLDER FOR FILE UPLOAD!! -->
             <label for="scheduleFile">Add File (placeholder):</label>
             <input type="file" id="scheduleFile" name="scheduleFile">
             

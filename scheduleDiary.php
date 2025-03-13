@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Verify user is logged in; if not, redirect to home.php
 if (!isset($_SESSION['user'])) {
     header("Location: home.php");
     exit();
@@ -9,10 +8,10 @@ if (!isset($_SESSION['user'])) {
 
 include('database.php');
 
-// Determine week offset (0 = current week; negative for past, positive for future)
+
 $weekOffset = isset($_GET['week']) ? intval($_GET['week']) : 0;
 
-// Calculate Monday for the current week, then adjust by the offset
+
 $monday = new DateTime();
 $monday->modify('Monday this week');
 if ($weekOffset !== 0) {
@@ -24,14 +23,17 @@ if ($weekOffset !== 0) {
     }
 }
 
-// Calculate Sunday (6 days after Monday)
+
 $sunday = clone $monday;
 $sunday->modify('+6 days');
 
 $startDate = $monday->format('Y-m-d');
 $endDate   = $sunday->format('Y-m-d');
 
-// Retrieve schedule diary entries for the week
+
+//ALL THE ABOVE IS BASICALLY THE SAME FROM THE SURVEY DIARY !!!!!!!!!!!!!!!!!!!!11
+
+// RETRIEVE THE ENTRIES 
 $query = "SELECT * FROM ScheduleDiary WHERE scheduleDate BETWEEN ? AND ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ss", $startDate, $endDate);
@@ -40,8 +42,8 @@ $result = $stmt->get_result();
 
 $schedules = [];
 while ($row = $result->fetch_assoc()) {
-    // Use composite key: scheduleDate and the first two digits of the start time (e.g., "2025-03-04_08")
-    // Note: If your column name is stored with different case, adjust accordingly.
+
+    //IF COLUMN NAME STORED WITH A DIFF CASE, ADJUST IT ACCORDINGLU - USER MAUAL!!!!!!
     $startTime = isset($row['ScheduleStartTime']) ? $row['ScheduleStartTime'] : $row['scheduleStartTime'];
     $key = $row['scheduleDate'] . '_' . substr($startTime, 0, 2);
     if (!isset($schedules[$key])) {
@@ -58,12 +60,12 @@ $stmt->close();
     <title>Schedule Diary</title>
     <link rel="stylesheet" href="scheduleDiary.css">
     <script>
-      // Wait for the DOM to load before attaching events
+      
       document.addEventListener("DOMContentLoaded", function() {
           var modal = document.getElementById("slotModal");
           var modalClose = document.querySelector(".modal-close");
 
-          // Attach click events to all timetable cells
+          
           var cells = document.getElementsByClassName("timeslot");
           Array.from(cells).forEach(function(cell) {
               cell.addEventListener("click", function() {
@@ -86,7 +88,7 @@ $stmt->close();
                   }
                   document.getElementById("modalBody").innerHTML = content;
                   
-                  // Set the Edit button URL with the date and hour from the key
+                  
                   var parts = key.split("_");
                   var datePart = parts[0];
                   var hourPart = parts[1];
@@ -96,12 +98,12 @@ $stmt->close();
               });
           });
 
-          // Close modal when the close icon is clicked
+          
           modalClose.onclick = function() {
               modal.style.display = "none";
           };
 
-          // Close modal if user clicks outside the modal content
+         
           window.onclick = function(event) {
               if (event.target == modal) {
                   modal.style.display = "none";
@@ -111,7 +113,7 @@ $stmt->close();
     </script>
 </head>
 <body>
-    <!-- Navigation Bar -->
+    
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>
@@ -141,13 +143,13 @@ $stmt->close();
             </div>
         </header>
         
-        <!-- Weekly Timetable -->
+        
         <table class="timetable">
             <thead>
                 <tr>
                     <th>Time</th>
                     <?php
-                        // Build table headers for Monday to Sunday
+                        
                         $days = [];
                         for ($i = 0; $i < 7; $i++) {
                             $day = clone $monday;
@@ -160,7 +162,7 @@ $stmt->close();
             </thead>
             <tbody>
                 <?php
-                    // Create one-hour slots from 8 AM to 6 PM
+                   
                     for ($hour = 8; $hour < 18; $hour++) {
                         echo "<tr>";
                         echo "<td>" . sprintf("%02d:00 - %02d:00", $hour, $hour + 1) . "</td>";
@@ -170,7 +172,7 @@ $stmt->close();
                             echo "<td class='timeslot' data-key='$key'>";
                             if (isset($schedules[$key])) {
                                 foreach ($schedules[$key] as $schedule) {
-                                    // Truncate schedule details to 50 characters for a clean preview
+                                    
                                     $details = htmlspecialchars($schedule['scheduleDetails']);
                                     if (strlen($details) > 50) {
                                         $details = substr($details, 0, 50) . '...';
@@ -193,19 +195,19 @@ $stmt->close();
         </table>
     </div>
     
-    <!-- Modal Pop-up for Schedule Slot Details -->
+    
     <div id="slotModal" class="modal">
         <div class="modal-content">
             <span class="modal-close">&times;</span>
             <h2>Schedule Details</h2>
             <div id="modalBody">
-                <!-- Details will be dynamically inserted here -->
+                <!-- DETAILS DYNAMICALLY INSERTED - HERE  -->
             </div>
             <a id="editButton" class="edit-btn" href="scheduleDiaryAdd.php">Edit / Add Entry</a>
         </div>
     </div>
     
-    <!-- Pass PHP schedule data to JavaScript -->
+  
     <script>
       var scheduleData = <?php echo json_encode($schedules); ?>;
     </script>

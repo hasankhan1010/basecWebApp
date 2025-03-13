@@ -6,14 +6,14 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// Optional search query
+// SEARCH QUERY: 
 $search = "";
 if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
 }
 
-// Query completed jobs from ScheduleDiary joined with Clients and (optionally) Payments
-// We assume scheduleStatus in ('complete','completed') and invoiceReference = scheduleID.
+//  QUERY COMPLETED JOBS FROM SCHEDULEDIARY JOINED WITH CLIENTS AND PAYMENTS (OPTIONAL THO)
+//  WE ASSUME SCHEDULESTATUS IN 'COMPLETE', 'COMPLETED' AND INVOICE REFERENCE = SCHEDULEID - NEED TO CHANGE THIS AFTER ANOTHER MEETING WITH BASECURITY
 $query = "SELECT sd.scheduleID, sd.scheduleJobType, sd.scheduleDate, sd.scheduleStartTime, sd.scheduleEndTime, sd.scheduleStatus,
                  c.clientID, c.clientFirstName, c.clientLastName, c.clientEmail,
                  p.paymentID, p.paymentAmount, p.paymentDateTime, p.paymentIsPaid, p.paymentNotes
@@ -23,7 +23,7 @@ $query = "SELECT sd.scheduleID, sd.scheduleJobType, sd.scheduleDate, sd.schedule
           WHERE sd.scheduleStatus IN ('complete','completed')";
 
 if ($search !== "") {
-    // Filter by client name, job type, or payment notes
+    // FILTER BY CLIENT NAME, JOB TYPE OR MAYMENT NOTES:::::::::::
     $query .= " AND (c.clientFirstName LIKE '%$search%'
                   OR c.clientLastName LIKE '%$search%'
                   OR sd.scheduleJobType LIKE '%$search%'
@@ -40,7 +40,7 @@ if ($result) {
     }
 }
 
-// Process form submission to update or insert payment records
+// PROCESS FORM SUBMISSION TO UPDATE OR INSERT NEW RECORDS 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if (isset($_POST['payments']) && is_array($_POST['payments'])) {
         foreach ($_POST['payments'] as $jobID => $data) {
@@ -48,16 +48,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $paymentIsPaid = (isset($data['paymentIsPaid']) && $data['paymentIsPaid'] === "Paid") ? 1 : 0;
             $paymentNotes  = $data['paymentNotes'] ?? "";
             $clientID      = $data['clientID'] ?? 0;
-            $paymentDateTime = date("Y-m-d H:i:s"); // Current time on update
+            $paymentDateTime = date("Y-m-d H:i:s"); // CURRENT TIME ON UPDATE - TIMESTAMP
 
-            // Check if a payment record exists for this job.
+            // CHECK IF A PAYMENT RECORD ALREADY EXISTS FOR THIS JOB
             $check = $conn->prepare("SELECT paymentID FROM Payments WHERE invoiceReference = ?");
             $check->bind_param("i", $jobID);
             $check->execute();
             $check->store_result();
 
             if ($check->num_rows > 0) {
-                // Update existing payment.
+                // UPDATE AN EXISTING PAYMENT
                 $check->bind_result($paymentID);
                 $check->fetch();
                 $check->close();
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $upd->close();
             } else {
                 $check->close();
-                // Insert new payment record.
+                // INSERT A NEW PAYMENT RECORD 
                 $ins = $conn->prepare("INSERT INTO Payments (clientID, invoiceReference, paymentAmount, paymentIsPaid, paymentNotes) 
                                        VALUES (?, ?, ?, ?, ?)");
                 $ins->bind_param("iidsi", $clientID, $jobID, $paymentAmount, $paymentIsPaid, $paymentNotes);
@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
     }
-    // Refresh page
+    // REFRESH PAGE
     header("Location: payments.php?search=" . urlencode($search));
     exit();
 }
@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <link rel="stylesheet" href="payments.css">
 </head>
 <body>
-  <!-- Navigation Bar -->
+  
   <nav class="navbar">
     <div class="nav-left">
       <a href="portal.php">Home</a>
@@ -165,7 +165,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
               <td>
                 <textarea name="payments[<?php echo $jobID; ?>][paymentNotes]" class="notes-input"><?php echo htmlspecialchars($paymentNotes); ?></textarea>
               </td>
-              <!-- Hidden field for clientID -->
+              <!-- A HIDDEN FIELD FOR CLIENT ID -->
               <input type="hidden" name="payments[<?php echo $jobID; ?>][clientID]" value="<?php echo $clientID; ?>">
             </tr>
             <?php endforeach; ?>

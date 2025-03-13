@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// AJAX endpoint: return logged-in user info as JSON.
+// AJAX ENDPPOINT - INFO RETURNED VIA JSON BY THE LOGGED IN USER
 if (isset($_GET['action']) && $_GET['action'] === 'getUser') {
     header('Content-Type: application/json');
     if (isset($_SESSION['user']) && isset($_SESSION['role'])) {
@@ -46,7 +46,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'getUser') {
     exit();
 }
 
-// Redirect to login page if user is not logged in.
+// NOT LOGGED IN - THEN RETURN TO HOME
 if (!isset($_SESSION['user'])) {
     header("Location: home.php");
     exit();
@@ -62,7 +62,8 @@ if (!isset($_SESSION['user'])) {
   <script src="js/jquery.min.js"></script>
   <script>
     $(document).ready(function(){
-      // Function to update user info via AJAX.
+      // UPDATES USER INFO VIA AJAX - JQUERY - YOUTUBE VID !!!!
+      // PHP WONT WORK?????????????????????
       function updateUserInfo() {
           $.ajax({
               url: 'portal.php',
@@ -80,10 +81,13 @@ if (!isset($_SESSION['user'])) {
               }
           });
       }
-      // Initial call and update every 5 seconds.
+      // CALL AND UPDATE EVERY 5SECS
       updateUserInfo();
       setInterval(updateUserInfo, 5000);
     });
+
+//ADD A FOOTER WITH BASECURTIY WEBSITE FOOTER - ALL RIGHTS RESERVED!!!!!!!!!!!!!!!!!!!!!1
+
   </script>
 </head>
 <body>
@@ -106,8 +110,8 @@ if (!isset($_SESSION['user'])) {
     </nav>
   </main>
   
-  <footer>
-    <p>&copy; <?php echo date("Y"); ?> BA Security. All rights reserved.</p>
+  <footer> 
+    <p>&copy; <?php echo date("Y"); ?> BA Security. All rights reserved.</p> 
   </footer>
 </body>
 </html>

@@ -1,77 +1,110 @@
 <?php
 session_start();
-// Optional: if you require user login to view metrics, uncomment:
-// if (!isset($_SESSION['user'])) {
-//     header("Location: home.php");
-//     exit();
-// }
-
 include('database.php');
 
-/*
-  CREATE TABLE SustainabilityMetrics (
-    metricID INT AUTO_INCREMENT PRIMARY KEY,
-    energyUsage DOUBLE,
-    carbonOffset DOUBLE,
-    metricMeasurementDateTime DATETIME DEFAULT CURRENT_TIMESTAMP,
-    metricNotes VARCHAR(250)
-  ) ENGINE=InnoDB;
-*/
-
-// If you want to process a new metric insertion via this page (optional):
-if (isset($_GET['action']) && $_GET['action'] === 'addMetric') {
-    // Example: Insert a random row (simulate data from sensors).
-    $energyUsage = rand(1, 100) + (rand(0,99)/100.0);
-    $carbonOffset = rand(1, 10) + (rand(0,99)/100.0);
-    $notes = "Auto-generated sample data";
-    $stmt = $conn->prepare("INSERT INTO SustainabilityMetrics (energyUsage, carbonOffset, metricNotes) VALUES (?, ?, ?)");
-    $stmt->bind_param("dds", $energyUsage, $carbonOffset, $notes);
-    $stmt->execute();
-    $stmt->close();
-    exit("Metric added");
+/**
+ * 
+ * RETRIEVE THE WEBSITE METRICS 
+ * NUMBER OF LOGGED IN USERS (FROM USERS TABLE)
+ * AMOUNT OF DATA ON THE WEBSITE (FROM A CONTENT TABLE)
+ * 
+ */
+function getWebsiteMetrics($conn) {
+    // QUERY FOR LOGGED IN USERS 
+    $activeUsersQuery = "SELECT COUNT(*) AS count FROM Users WHERE isLoggedIn = 1";
+    $resultUsers = mysqli_query($conn, $activeUsersQuery);
+    $rowUsers = mysqli_fetch_assoc($resultUsers);
+    $activeUsers = (int)$rowUsers['count'];
+    
+    // QUERY FOR AMOUNT OF DATA 
+    $dataQuery = "SELECT COUNT(*) AS count FROM Content";
+    $resultData = mysqli_query($conn, $dataQuery);
+    $rowData = mysqli_fetch_assoc($resultData);
+    $dataCount = (int)$rowData['count'];
+    
+    return [
+        'activeUsers' => $activeUsers,
+        'dataCount' => $dataCount
+    ];
+}
+/**
+ * ESTIMATE ENERGY USAGE (IN KWH) BASED ON WEBSITE METRICS
+ * ADJUST THE FACTORS AS NEEDED 
+ */
+function calculateEnergyUsageFromWebsiteMetrics($metrics) {
+    $userFactor = 0.05; // KWH PER ACTIVE USER - AVERAGE ESTIMATES 
+    $dataFactor = 0.001; // KWH PER CONTENT RECORD - AVERAGE ESTIMATE 
+    return ($metrics['activeUsers'] * $userFactor) + ($metrics['dataCount'] * $dataFactor);
+}
+/**
+ * ESTIMATE CARBON OFFSET BASED ON ENERGY USAGE 
+ */
+function calculateCarbonOffsetFromEnergyUsage($energyUsage) {
+    $emissionFactor = 0.4; // KG CO2 PER KWH
+    return $energyUsage * $emissionFactor;
 }
 
-// If an AJAX request to fetch metrics data:
-if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
-    header('Content-Type: application/json');
 
-    // 1. Retrieve the most recent metrics (e.g., last 20 rows).
-    $latestQuery = "SELECT * FROM SustainabilityMetrics ORDER BY metricMeasurementDateTime DESC LIMIT 20";
-    $latestResult = mysqli_query($conn, $latestQuery);
-    $latestMetrics = [];
-    while ($row = mysqli_fetch_assoc($latestResult)) {
-        $latestMetrics[] = $row;
+// PROCESS METRIC INSERTION OR DATA RETRIEVAL BASED ON THE ACTION PARAMETER
+if (isset($_GET['action'])) {
+    if ($_GET['action'] === 'addMetric') {
+        // GET WEBSITE METRICS 
+        $metrics = getWebsiteMetrics($conn);
+
+        // CALCULATE ESTIMATED ENERGY USAGE AND CARBON OFFSET 
+        $energyUsage = calculateEnergyUsageFromWebsiteMetrics($metrics);
+        $carbonOffset = calculateCarbonOffsetFromEnergyUsage($energyUsage);
+        $notes = "Estimated from website metrics: " . $metrics['activeUsers'] . " active users, " . $metrics['dataCount'] . " data records";
+        
+        // INSERT THE CALCULATED VALUES INTO THE DATABASE 
+        $stmt = $conn->prepare("INSERT INTO SustainabilityMetrics (energyUsage, carbonOffset, metricNotes) VALUES (?, ?, ?)");
+        $stmt->bind_param("dds", $energyUsage, $carbonOffset, $notes);
+        $stmt->execute();
+        $stmt->close();
+        exit("Metric added");
     }
 
-    // 2. Calculate hourly average (last 60 minutes).
-    $hourAgo = date('Y-m-d H:i:s', strtotime('-1 hour'));
-    $hourQuery = "SELECT AVG(energyUsage) AS avgEnergy, AVG(carbonOffset) AS avgCarbon
-                  FROM SustainabilityMetrics
-                  WHERE metricMeasurementDateTime >= '$hourAgo'";
-    $hourResult = mysqli_query($conn, $hourQuery);
-    $hourData = mysqli_fetch_assoc($hourResult);
+    if ($_GET['action'] === 'fetchData') {
+        header('Content-Type: application/json');
 
-    // 3. Calculate weekly average (last 7 days).
-    $weekAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
-    $weekQuery = "SELECT AVG(energyUsage) AS avgEnergy, AVG(carbonOffset) AS avgCarbon
-                  FROM SustainabilityMetrics
-                  WHERE metricMeasurementDateTime >= '$weekAgo'";
-    $weekResult = mysqli_query($conn, $weekQuery);
-    $weekData = mysqli_fetch_assoc($weekResult);
+        // RETRIEVE THE 20 MOST RECENT METRIC ENTRIES:::::::
+        $latestQuery = "SELECT * FROM SustainabilityMetrics ORDER BY metricMeasurementDateTime DESC LIMIT 20";
+        $latestResult = mysqli_query($conn, $latestQuery);
+        $latestMetrics = [];
+        while ($row = mysqli_fetch_assoc($latestResult)) {
+            $latestMetrics[] = $row;
+        }
 
-    // Return JSON
-    echo json_encode([
-        'latestMetrics' => $latestMetrics,
-        'hourlyAvg' => [
-            'energy' => $hourData['avgEnergy'] ?? 0,
-            'carbon' => $hourData['avgCarbon'] ?? 0
-        ],
-        'weeklyAvg' => [
-            'energy' => $weekData['avgEnergy'] ?? 0,
-            'carbon' => $weekData['avgCarbon'] ?? 0
-        ]
-    ]);
-    exit();
+        // CALCULATE HOURLY AVERAGE::::::::::::::
+        $hourAgo = date('Y-m-d H:i:s', strtotime('-1 hour'));
+        $hourQuery = "SELECT AVG(energyUsage) AS avgEnergy, AVG(carbonOffset) AS avgCarbon
+                      FROM SustainabilityMetrics
+                      WHERE metricMeasurementDateTime >= '$hourAgo'";
+        $hourResult = mysqli_query($conn, $hourQuery);
+        $hourData = mysqli_fetch_assoc($hourResult);
+
+        // CALCULATE WEEKLY AVERAGE:::::::
+        $weekAgo = date('Y-m-d H:i:s', strtotime('-7 days'));
+        $weekQuery = "SELECT AVG(energyUsage) AS avgEnergy, AVG(carbonOffset) AS avgCarbon
+                      FROM SustainabilityMetrics
+                      WHERE metricMeasurementDateTime >= '$weekAgo'";
+        $weekResult = mysqli_query($conn, $weekQuery);
+        $weekData = mysqli_fetch_assoc($weekResult);
+
+        // RETURN THE DATA IN JSON FORMAT 
+        echo json_encode([
+            'latestMetrics' => $latestMetrics,
+            'hourlyAvg' => [
+                'energy' => $hourData['avgEnergy'] ?? 0,
+                'carbon' => $hourData['avgCarbon'] ?? 0
+            ],
+            'weeklyAvg' => [
+                'energy' => $weekData['avgEnergy'] ?? 0,
+                'carbon' => $weekData['avgCarbon'] ?? 0
+            ]
+        ]);
+        exit();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -82,7 +115,8 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
   <link rel="stylesheet" href="sustainabilityMetrics.css">
   <script src="js/jquery.min.js"></script>
   <script>
-    // Periodically fetch data from the server and update the page
+ 
+    // PREIODICSALLY FETCH AND UPDATE METRICS ON THE PAGE 
     function fetchMetrics() {
       $.ajax({
         url: 'sustainabilityMetrics.php',
@@ -90,13 +124,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
         data: { action: 'fetchData' },
         dataType: 'json',
         success: function(data) {
-          // Update Hourly & Weekly Averages
-          $('#hourlyEnergy').text( parseFloat(data.hourlyAvg.energy).toFixed(2) );
-          $('#hourlyCarbon').text( parseFloat(data.hourlyAvg.carbon).toFixed(2) );
-          $('#weeklyEnergy').text( parseFloat(data.weeklyAvg.energy).toFixed(2) );
-          $('#weeklyCarbon').text( parseFloat(data.weeklyAvg.carbon).toFixed(2) );
+          // UPDATE HOURLY AND WEEKLY AVERAGES 
+          $('#hourlyEnergy').text(parseFloat(data.hourlyAvg.energy).toFixed(2));
+          $('#hourlyCarbon').text(parseFloat(data.hourlyAvg.carbon).toFixed(2));
+          $('#weeklyEnergy').text(parseFloat(data.weeklyAvg.energy).toFixed(2));
+          $('#weeklyCarbon').text(parseFloat(data.weeklyAvg.carbon).toFixed(2));
 
-          // Update Latest Metrics Table
+          // UPDATE THE LATEST METRICS TABLE 
           var tbody = $('#latestMetricsTable tbody');
           tbody.empty();
           data.latestMetrics.forEach(function(row) {
@@ -120,20 +154,15 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
     }
 
     $(document).ready(function(){
-      // Fetch initial data
-      fetchMetrics();
-      // Update every 30 seconds
-      setInterval(fetchMetrics, 30000);
 
-      // If you want to simulate adding new metric data, you can do it here
-      // setInterval(function(){
-      //   $.get('sustainabilityMetrics.php', { action: 'addMetric' });
-      // }, 60000); // e.g. every 60 seconds
+      // INITIAL FETCH AND THEN REFRESH EVERY 30 SECONDS 
+      fetchMetrics();
+      setInterval(fetchMetrics, 30000);
     });
   </script>
 </head>
 <body>
-  <!-- Navigation Bar -->
+  
   <nav class="navbar">
     <div class="nav-left">
       <a href="portal.php">Home</a>
@@ -154,7 +183,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
   <div class="container">
     <h1>Sustainability Metrics</h1>
     
-    <!-- Hourly & Weekly Averages -->
+    <!-- REAL TIME AVERAGES  -->
     <fieldset class="averages-fieldset">
       <legend>Real-Time Averages</legend>
       <div class="average-row">
@@ -169,7 +198,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
       </div>
     </fieldset>
     
-    <!-- Latest Metrics Table -->
+    <!-- LATEST METRICS TABLE  -->
     <fieldset class="latest-metrics-fieldset">
       <legend>Latest Metrics</legend>
       <table id="latestMetricsTable">
@@ -177,12 +206,12 @@ if (isset($_GET['action']) && $_GET['action'] === 'fetchData') {
           <tr>
             <th>Date / Time</th>
             <th>Energy Usage (kWh)</th>
-            <th>Carbon Offset (kg CO2)</th>
+            <th>Carbon Offset (kg CO₂)</th>
             <th>Notes</th>
           </tr>
         </thead>
         <tbody>
-          <!-- Populated by AJAX -->
+          <!-- DATA POPULATED VIA AJAX  -->
         </tbody>
       </table>
     </fieldset>

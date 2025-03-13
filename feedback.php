@@ -6,14 +6,15 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// Process optional search query.
+// SEARCH QUERY:::::
 $search = "";
 if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
 }
 
-// Query recent jobs from ScheduleDiary (only jobs with status "complete" or "completed")
-// and join with Clients to get client details. We LEFT JOIN the Feedback table on scheduleID = feedbackID.
+// ONLY QUERY THE RECENT JOBS WITH 'COMPLETE' OR 'COMPLETED'
+// LEFT JOIN THE CLIENTS TO GET CLIENT DETAILS - NEEDS TO BE DONE VIA FEEDBACK TABLE ON SCHEDULEID = FEEDBACKID
+
 $query = "SELECT sd.scheduleID, sd.scheduleJobType, sd.engineerID, sd.scheduleDate, 
                  sd.scheduleStartTime, sd.scheduleEndTime, sd.scheduleDetails, sd.scheduleStatus,
                  c.clientFirstName, c.clientLastName, c.clientEmail,
@@ -24,7 +25,7 @@ $query = "SELECT sd.scheduleID, sd.scheduleJobType, sd.engineerID, sd.scheduleDa
           WHERE sd.scheduleStatus IN ('complete', 'completed')";
 
 if ($search !== "") {
-    // You can search by client name, job type, or feedback fields.
+    // YOU CAN SEARCH BY CLIENT NAME, FEEDBACK ETC:::::::::
     $query .= " AND (c.clientFirstName LIKE '%$search%' 
                   OR c.clientLastName LIKE '%$search%' 
                   OR sd.scheduleJobType LIKE '%$search%' 
@@ -48,7 +49,7 @@ if ($result) {
   <link rel="stylesheet" href="feedback.css">
 </head>
 <body>
-  <!-- Navigation Bar -->
+ 
   <nav class="navbar">
     <div class="nav-left">
       <a href="portal.php">Home</a>
@@ -68,7 +69,7 @@ if ($result) {
   
   <div class="container">
     <h1>Job Feedback</h1>
-    <!-- Search Bar and Refresh Button -->
+    <!--     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!1                SEARCH BAR AND A REFRESH BUTTON -->
     <div class="search-refresh">
       <form method="get" action="feedback.php" class="search-form">
         <input type="text" name="search" placeholder="Search feedback..." value="<?php echo htmlspecialchars($search); ?>">
@@ -77,7 +78,7 @@ if ($result) {
       <button onclick="location.reload()">Refresh</button>
     </div>
     
-    <!-- Table of Job Entries -->
+    <!-- TABLE FOR JOB ENTRIES  -->
     <div class="feedback-list">
       <?php if (!empty($entries)): ?>
       <table>
@@ -108,7 +109,7 @@ if ($result) {
             } else {
                 $feedback = "No feedback";
             }
-            // If no feedback exists, provide a mailto link to send survey.
+            // IF NO FEEDBACK ECISTS, MAILTO THE SURVEY
             $action = "";
             if (empty($entry['feedbackRating'])) {
                 $subject = rawurlencode("BASecurity Feedback Survey");

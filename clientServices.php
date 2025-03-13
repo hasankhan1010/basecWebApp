@@ -6,18 +6,20 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// Process optional search query.
+// PROCESS THE OPTIONAL SEARCH QUERY:::::::::
 $search = "";
 if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
 }
 
-// Query all clients (displaying ID, first name, last name, email, and phone).
+// QUERY ALL CLIENTS - DISPLAYING THE RELATIVE INFO::::
 $query = "SELECT clientID, clientFirstName, clientLastName, clientEmail, clientPhone FROM Clients";
 if ($search !== "") {
     $query .= " WHERE clientFirstName LIKE '%$search%' OR clientLastName LIKE '%$search%' OR clientEmail LIKE '%$search%' OR clientPhone LIKE '%$search%'";
 }
 $query .= " ORDER BY clientID ASC";
+
+
 $result = mysqli_query($conn, $query);
 $clients = [];
 if ($result) {
@@ -25,6 +27,8 @@ if ($result) {
         $clients[] = $row;
     }
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,7 +39,7 @@ if ($result) {
     <script src="js/jquery.min.js"></script>
 </head>
 <body>
-    <!-- Navigation Bar -->
+
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>

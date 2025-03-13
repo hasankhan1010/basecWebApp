@@ -6,7 +6,7 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// Get logged-in user info
+// GET THE LOGGED-IN USER INFO
 $userInfo = [];
 if (isset($_SESSION['user']) && isset($_SESSION['role'])) {
     $role = $_SESSION['role'];
@@ -49,13 +49,13 @@ if (isset($_SESSION['user']) && isset($_SESSION['role'])) {
     }
 }
 
-// Optional: Process a search query.
+// PROCESS A SEARCH QUERY - OPTIONAL????????
 $search = "";
 if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
 }
 
-// Retrieve notifications for Low Feedback and Sustainability Alert.
+// GET NOTIFICATIONS OF BAD FEEDBACK AND SUSTAINABILITY ALERTS 
 $query = "SELECT * FROM Notifications 
           WHERE notificationType IN ('Low Feedback', 'Sustainability Alert')";
 if ($search !== "") {
@@ -79,7 +79,7 @@ if ($result) {
     <script src="js/jquery.min.js"></script>
     <script>
       $(document).ready(function(){
-          // When a notification checkbox is toggled, update read status via AJAX.
+          //  WHEN NOTIFICATION CHECKBOX IS TOGGLED, UPDATE THE READ STATUS VIA AJAX
           $(".read-checkbox").change(function(){
               var notificationID = $(this).data("notificationid");
               var isRead = $(this).is(":checked") ? 1 : 0;
@@ -99,7 +99,7 @@ if ($result) {
     </script>
 </head>
 <body>
-    <!-- Navigation Bar -->
+   
     <nav class="navbar">
       <div class="nav-left">
         <a href="portal.php">Home</a>
@@ -148,8 +148,8 @@ if ($result) {
                 </thead>
                 <tbody>
                     <?php foreach($notifications as $note): 
-                        // For action button: if Low Feedback, link to clientServiceEdit.php using clientID;
-                        // if Sustainability Alert, link to sustainabilityMetrics.php (or a dedicated metrics page).
+                        //  FOR ACTION BUTTON: IF LOW FEEDBACK, LINK TO CLIENTSERVICEEDIT.PHP USING CLIENT ID
+                        // IF ITA A SUSTAINABILITY ALERT, LINK IT TO SUSTAINABILITYMETRICS.PHP
                         $clientID = $note['clientID'];
                         if($note['notificationType'] === 'Low Feedback'){
                             $actionLink = "<a href='clientServiceEdit.php?clientID={$clientID}' class='action-btn'>View Client</a>";

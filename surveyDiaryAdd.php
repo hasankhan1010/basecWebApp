@@ -14,16 +14,16 @@ $surveyCreatedByID = "";
 $surveyNotes = "";
 $surveyStatus = "";
 
-// Pre-fill date and time if provided via GET (for a new entry)
+//  PRE-FILL THE DATA AND TIME IF PROVIDED - USING 'GET' (NEW ENTRIES)
 if (isset($_GET['date'])) {
     $surveyDate = $_GET['date'];
 }
 if (isset($_GET['hour'])) {
-    // Convert the hour (e.g., "08") into a time string "08:00:00"
+    // CONVERT HOUR INTO TIME STRING --------- CHANGE!!!!
     $surveyTime = $_GET['hour'] . ":00:00";
 }
 
-// If editing an existing entry, load its values
+// EDITING EXISTING ENTRIES - LOAD THE VALUES 
 if ($surveyID && $conn) {
     $query = "SELECT * FROM SurveyDiary WHERE surveyID = ?";
     $stmt = $conn->prepare($query);
@@ -40,7 +40,7 @@ if ($surveyID && $conn) {
     $stmt->close();
 }
 
-// Process the form submission
+// PROCESSING THE FORM SUBMISSION
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $surveyID = isset($_POST['surveyID']) ? $_POST['surveyID'] : "";
     $surveyDate = $_POST['surveyDate'];
@@ -50,14 +50,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $surveyStatus = $_POST['surveyStatus'];
     
     if ($surveyID) {
-        // Update existing record
+        // UPDATE THE EXISTING RECORD 
         $query = "UPDATE SurveyDiary SET surveyDate=?, surveyTime=?, surveyCreatedByID=?, surveyNotes=?, surveyStatus=? WHERE surveyID=?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sssssi", $surveyDate, $surveyTime, $surveyCreatedByID, $surveyNotes, $surveyStatus, $surveyID);
         $stmt->execute();
         $stmt->close();
     } else {
-        // Insert new record
+        // INSERT THE NEW RECORD 
         $query = "INSERT INTO SurveyDiary (surveyDate, surveyTime, surveyCreatedByID, surveyNotes, surveyStatus) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sssss", $surveyDate, $surveyTime, $surveyCreatedByID, $surveyNotes, $surveyStatus);
@@ -76,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="surveyDiaryAdd.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
+    <!-- NAV BAR -->
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>

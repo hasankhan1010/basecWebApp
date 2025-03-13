@@ -6,9 +6,7 @@ if (!isset($_SESSION['user'])) {
 }
 include('database.php');
 
-// ----------------------------------------------
-// Process Deletion for Users
-// ----------------------------------------------
+// THE PROCESS OF DELETING::::::::::::::::::::::::::::::
 if (isset($_GET['action']) && $_GET['action'] === 'deleteUser' && isset($_GET['role']) && isset($_GET['id'])) {
     $role = $_GET['role'];
     $id = intval($_GET['id']);
@@ -21,28 +19,26 @@ if (isset($_GET['action']) && $_GET['action'] === 'deleteUser' && isset($_GET['r
     } elseif ($role === 'sales') {
         $conn->query("DELETE FROM SalesTeam WHERE SalesID = $id");
     }
-    // Optionally log deletion event here.
+    // A LOG DELETION EVENT? - INCLUDED - ADD TO DOCUMENT
     header("Location: adminControl.php");
     exit();
 }
 
-// ----------------------------------------------
-// Process Adding New Users
-// ----------------------------------------------
+// ADDING NEW USERS:::::::::::::::::
 $addUserMessage = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['addUser'])) {
     $role = $_POST['userRole'] ?? '';
-    // Gather common fields
+    // ALL THE FIELDS 
     $firstName = $_POST['firstName'] ?? '';
     $lastName  = $_POST['lastName'] ?? '';
     $email     = $_POST['email'] ?? '';
     $phone     = $_POST['phone'] ?? '';
     $username  = $_POST['username'] ?? '';
-    $password  = $_POST['password'] ?? ''; // In production, use proper hashing!
+    $password  = $_POST['password'] ?? ''; // SHOULD I USE HASHING? - IF NOT THEN I EXPLAIN WHY
     $status    = $_POST['status'] ?? '';
     $notes     = $_POST['notes'] ?? '';
     
-    // Role-specific fields (example: engineerSpeciality for engineers)
+    // ROLE-SPECIFIC FIELDS - EASIER TO DO IT LIKE THIS:::::
     $speciality = $_POST['speciality'] ?? '';
     
     if ($role === 'engineer') {
@@ -68,9 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['addUser'])) {
     }
 }
 
-// ----------------------------------------------
-// Process Adding New Client Manually
-// ----------------------------------------------
+// MANUALLY ADDING A NEW CLIENT
 $addClientMessage = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['addClient'])) {
     $clientFirstName = $_POST['clientFirstName'] ?? '';
@@ -91,20 +85,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['addClient'])) {
     $stmt->close();
 }
 
-// ----------------------------------------------
-// Process CSV Import for Clients
-// ----------------------------------------------
+// CSV IMPORT - LIKE FROM OLD SYSTEM TO NEW - DB IMPORT
 $importMessage = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['importClients'])) {
     if (isset($_FILES['csvFile']) && $_FILES['csvFile']['error'] === UPLOAD_ERR_OK) {
         $csvFile = $_FILES['csvFile']['tmp_name'];
         $handle = fopen($csvFile, 'r');
         if ($handle !== FALSE) {
-            // Skip header row if needed (assuming first row is header)
+            // SKIPPING THE HEADER ROW 
             fgetcsv($handle, 1000, ",");
             $importCount = 0;
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                // Assume CSV columns in order: firstName, lastName, address1, address2, phone, email, notes
+                // CSV COLUMNS IN ORDER:::::::::::::::::::::::::::
                 $firstName = $data[0] ?? '';
                 $lastName  = $data[1] ?? '';
                 $address1  = $data[2] ?? '';
@@ -129,11 +121,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['importClients'])) {
     }
 }
 
-// ----------------------------------------------
-// Retrieve Active Users (for logbook view)
-// ----------------------------------------------
+// GETTING ALL ACTIVE USER INFO - FOR LOGBOOK VIEWING
 $activeUsers = [];
-// Active managers.
+// ACTIVE MANAGERS 
 $query = "SELECT managerID AS userID, managerUsername AS username, managerFirstName AS firstName, managerLastName AS lastName, 'Manager' AS role FROM Manager WHERE managerIsActive = 1";
 $result = mysqli_query($conn, $query);
 if ($result) {
@@ -141,7 +131,7 @@ if ($result) {
         $activeUsers[] = $row;
     }
 }
-// Active engineers.
+// ACTIVE ENGINEERS
 $query = "SELECT engineerID AS userID, engineerUsername AS username, engineerFirstName AS firstName, engineerLastName AS lastName, 'Engineer' AS role FROM Engineer WHERE engineerIsActive = 1";
 $result = mysqli_query($conn, $query);
 if ($result) {
@@ -149,7 +139,7 @@ if ($result) {
         $activeUsers[] = $row;
     }
 }
-// Active administrators.
+// ACTIVE ADMINISTRATORS 
 $query = "SELECT adminID AS userID, adminUsername AS username, adminFirstName AS firstName, adminLastName AS lastName, 'Admin' AS role FROM Administrator WHERE adminIsActive = 1";
 $result = mysqli_query($conn, $query);
 if ($result) {
@@ -157,7 +147,7 @@ if ($result) {
         $activeUsers[] = $row;
     }
 }
-// Active sales team.
+// ACTIVE SALES TEAM
 $query = "SELECT SalesID AS userID, salesUsername AS username, salesFirstName AS firstName, salesLastName AS lastName, 'Sales' AS role FROM SalesTeam WHERE salesIsActive = 1";
 $result = mysqli_query($conn, $query);
 if ($result) {
@@ -166,8 +156,8 @@ if ($result) {
     }
 }
 
-// ----------------------------------------------
-// Retrieve System Log (from AdminLog table, if exists)
+// RETRIEVE THE SYSTEM LOG FROM THE ADMINLOG TABLE 
+
 $adminLog = [];
 $tableCheck = $conn->query("SHOW TABLES LIKE 'AdminLog'");
 if ($tableCheck && $tableCheck->num_rows > 0) {
@@ -189,7 +179,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     <script src="js/jquery.min.js"></script>
     <script>
     $(document).ready(function(){
-        // Here you can add AJAX calls to update logs in real time if needed.
+        // ADD AJAX HERE TO UPDATE LOGS IN REAL TIME - OPTIONAL!??
     });
     </script>
 </head>
@@ -214,11 +204,11 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     <div class="container">
         <h1>Admin Control Panel</h1>
         
-        <!-- Section: User Management -->
+        <!-- USER MANAGEMENT FIRST -->
         <section class="user-management">
             <h2>User Management</h2>
             <div class="user-forms">
-                <!-- Add New User Form -->
+                <!-- ADDING NEW USER FORM -->
                 <form method="post" action="adminControl.php">
                     <h3>Add New User</h3>
                     <label for="userRole">Role:</label>
@@ -241,7 +231,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
                     <input type="text" name="username" id="username" required>
                     <label for="password">Password:</label>
                     <input type="password" name="password" id="password" required>
-                    <!-- For engineers, we include speciality -->
+                    <!-- NEED TO INCLUDE SPECIALTY FOR ENGINEERS  -->
                     <div id="specialityField" style="display:none;">
                         <label for="speciality">Speciality:</label>
                         <input type="text" name="speciality" id="speciality">
@@ -253,7 +243,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
                     <button type="submit" name="addUser">Add User</button>
                 </form>
             </div>
-            <!-- Active Users Table -->
+            <!-- ACTIVE USERS TABLE !!! -->
             <div class="active-users-section">
                 <h3>Active Users</h3>
                 <table>
@@ -287,11 +277,11 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             </div>
         </section>
         
-        <!-- Section: Client Management -->
+        <!-- CLIENT MANAGEMENT:::::::: -->
         <section class="client-management">
             <h2>Client Management</h2>
             <div class="client-forms">
-                <!-- Add New Client Form -->
+                <!-- ADD NEW CLIENT FORM::::::::::: -->
                 <form method="post" action="adminControl.php">
                     <h3>Add New Client</h3>
                     <label for="clientFirstName">First Name:</label>
@@ -311,7 +301,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
                     <button type="submit" name="addClient">Add Client</button>
                 </form>
                 
-                <!-- Import Clients via CSV -->
+                <!-- CSV IMPORTING::::::::::::: -->
                 <form method="post" action="adminControl.php" enctype="multipart/form-data">
                     <h3>Import Clients (CSV)</h3>
                     <label for="csvFile">CSV File:</label>
@@ -324,7 +314,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             </div>
         </section>
         
-        <!-- Section: System Log -->
+        <!-- SYSTEM LOG ::::: -->
         <section class="system-log">
             <h2>System Log</h2>
             <?php if (!empty($adminLog)): ?>
@@ -361,7 +351,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     </footer>
     
     <script>
-    // Show/hide speciality field for engineers when role changes
+    // ADD  A SHOW SPECIALTY FIELD FOR ENGINEERS WHEN A ROLE CHANGES
     document.getElementById('userRole').addEventListener('change', function(){
         if (this.value === 'engineer') {
             document.getElementById('specialityField').style.display = 'block';
