@@ -1,9 +1,12 @@
 
 <?php
+
+
+
 $servername = "baseccrmdb.mysql.database.azure.com";
 $username = "basecAdmin1"; 
 $password = "BasecurityAdmin@0987"; 
-$dbname = "basecuritydb";
+$dbname = "baseccrmdb";
 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -16,5 +19,3 @@ if ($conn->connect_error) {
     $conn = null;
 }
 ?>
-
-
