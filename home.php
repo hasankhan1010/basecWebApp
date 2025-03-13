@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 
 // SEND TO PORTAL IG LOGGED IN
@@ -66,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <?php if ($error !== ''): ?>
         <div class="error"><?php echo $error; ?></div>
       <?php endif; ?>
-      <form method="post" action="home.php">
+      <form method="post" action="index.php">
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required>
         
