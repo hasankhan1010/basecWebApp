@@ -1,17 +1,20 @@
 
 <?php
-$servername = "localhost";
-$username = "root"; // Default for XAMPP
-$password = ""; // Default is empty
+$servername = "baseccrmdb.mysql.database.azure.com";
+$username = "basecAdmin1"; 
+$password = "BasecurityAdmin@0987"; 
 $dbname = "basecuritydb";
+
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection silently
+// CHECK CONNECTION
 if ($conn->connect_error) {
-    // Log error to server logs, but don't display to user
+    // LOG ERROR TO SERVER LOGS BUT DONT DISPLAY THIS TO THE USER 
     error_log("Database connection failed: " . $conn->connect_error);
-    // Set $conn to null so other scripts know it’s invalid
+    // SET THE $conn TO NULL!!! SO OTHERS KNOW THAT ITS INVALID 
     $conn = null;
 }
 ?>
+
+
