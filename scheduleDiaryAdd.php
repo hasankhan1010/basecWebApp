@@ -8,7 +8,7 @@ if (!isset($_SESSION['user'])) {
 include('database.php');
 
 /*
-  THESE ARE THE EXPECTED COLUMNS IN SCHEDULE DIARY:::::
+  EXPECTED COLUMNS IN SCHEDULE DIARY:
     scheduleID (INT, PK)
     scheduleDate (DATE)
     scheduleStartTime (TIME)
@@ -22,7 +22,7 @@ include('database.php');
     scheduleNotes (TEXT/VARCHAR)
 */
 
-// LOAD THE LSIT OF VALID ENGINEERS IN A DROP-DOWN
+// LOAD THE LIST OF VALID ENGINEERS IN A DROP-DOWN
 $engineers = [];
 $engQuery = "SELECT engineerID, engineerFirstName, engineerLastName FROM Engineer";
 $engResult = mysqli_query($conn, $engQuery);
@@ -32,7 +32,7 @@ if ($engResult) {
     }
 }
 
-// THE SAME BUT WITH THE CLIENTS 
+// THE SAME BUT WITH THE CLIENTS
 $clients = [];
 $clientQuery = "SELECT clientID, clientFirstName, clientLastName FROM Clients";
 $clientResult = mysqli_query($conn, $clientQuery);
@@ -42,7 +42,7 @@ if ($clientResult) {
     }
 }
 
-// THE VAIRABLES - INITLIAZE
+// THE VARIABLES - INITIALIZE
 $scheduleID              = isset($_GET['scheduleID']) ? intval($_GET['scheduleID']) : 0;
 $scheduleDate            = "";
 $scheduleStartTime       = "";
@@ -50,7 +50,7 @@ $scheduleEndTime         = "";
 $engineerID              = "";
 $clientID                = "";
 $scheduleJobType         = "";
-$scheduleIsAnnualService = 0; // 0 = FALSE, 1 = TRUE !!!
+$scheduleIsAnnualService = 0; // 0 = FALSE, 1 = TRUE
 $scheduleStatus          = "";
 $scheduleDetails         = "";
 $scheduleNotes           = "";
@@ -60,36 +60,53 @@ if (isset($_GET['date'])) {
     $scheduleDate = $_GET['date'];
 }
 if (isset($_GET['hour'])) {
-  
     $clickedHour = intval($_GET['hour']);
     if ($clickedHour >= 0 && $clickedHour < 24) {
         $scheduleStartTime = str_pad($clickedHour, 2, '0', STR_PAD_LEFT) . ":00:00";
     }
 }
 
-//  IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERIRDE ANY GET PRE-FILLS)
+// IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERRIDE ANY GET PRE-FILLS)
 if ($scheduleID > 0 && $conn) {
-    $query = "SELECT * FROM ScheduleDiary WHERE scheduleID = ?";
-    $stmt  = $conn->prepare($query);
+    // Explicitly list columns instead of SELECT *
+    $query = "SELECT
+                scheduleDate,
+                scheduleStartTime,
+                scheduleEndTime,
+                engineerID,
+                clientID,
+                scheduleJobType,
+                scheduleIsAnnualService,
+                scheduleStatus,
+                scheduleDetails,
+                scheduleNotes
+              FROM ScheduleDiary
+              WHERE scheduleID = ?";
+    $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $scheduleID);
     $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $scheduleDate            = $row['scheduleDate'];
-        $scheduleStartTime       = $row['scheduleStartTime'];
-        $scheduleEndTime         = $row['scheduleEndTime'];
-        $engineerID              = $row['engineerID'];
-        $clientID                = $row['clientID'];
-        $scheduleJobType         = $row['scheduleJobType'];
-        $scheduleIsAnnualService = $row['scheduleIsAnnualService'];
-        $scheduleStatus          = $row['scheduleStatus'];
-        $scheduleDetails         = $row['scheduleDetails'];
-        $scheduleNotes           = $row['scheduleNotes'];
+
+    // Use store_result() + bind_result() instead of get_result()
+    $stmt->store_result();
+    if ($stmt->num_rows > 0) {
+        $stmt->bind_result(
+            $scheduleDate,
+            $scheduleStartTime,
+            $scheduleEndTime,
+            $engineerID,
+            $clientID,
+            $scheduleJobType,
+            $scheduleIsAnnualService,
+            $scheduleStatus,
+            $scheduleDetails,
+            $scheduleNotes
+        );
+        $stmt->fetch();
     }
     $stmt->close();
 }
 
-// THE PROCESS FORM SUBMISSION -
+// PROCESS FORM SUBMISSION
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleID              = isset($_POST['scheduleID']) ? intval($_POST['scheduleID']) : 0;
     $scheduleDate            = $_POST['scheduleDate'];
@@ -103,11 +120,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleDetails         = $_POST['scheduleDetails'];
     $scheduleNotes           = $_POST['scheduleNotes'];
     
-    // THIS IS A PLACEHOLDER FOR FILE HANDLING - SORT THIS OUT ASAP
+    // PLACEHOLDER FOR FILE HANDLING
     // $file = $_FILES['scheduleFile'] ?? null;
     
     if ($scheduleID > 0) {
-        // UPDATE THE EXISING RECORD - 11 PLACEHOLDERS!!!!!!
+        // UPDATE THE EXISTING RECORD
         $query = "UPDATE ScheduleDiary
                   SET scheduleDate = ?,
                       scheduleStartTime = ?,
@@ -138,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $stmt->close();
     } else {
-        // INSERT NEW RECORD - 1- PLACEHOLDERSSSSSS
+        // INSERT NEW RECORD
         $query = "INSERT INTO ScheduleDiary (
                     scheduleDate,
                     scheduleStartTime,
@@ -168,6 +185,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $stmt->close();
     }
+
+    // Redirect back to main schedule diary page
     header("Location: scheduleDiary.php");
     exit();
 }
@@ -180,7 +199,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="scheduleDiaryAdd.css">
 </head>
 <body>
-   
     <nav class="navbar">
         <div class="nav-left">
             <a href="portal.php">Home</a>
@@ -206,19 +224,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php endif; ?>
             
             <label for="scheduleDate">Date:</label>
-            <input type="date" id="scheduleDate" name="scheduleDate" value="<?php echo htmlspecialchars($scheduleDate); ?>" required>
+            <input type="date" id="scheduleDate" name="scheduleDate" 
+                   value="<?php echo htmlspecialchars($scheduleDate); ?>" required>
             
             <label for="scheduleStartTime">Start Time:</label>
-            <input type="time" id="scheduleStartTime" name="scheduleStartTime" value="<?php echo htmlspecialchars($scheduleStartTime); ?>" required>
+            <input type="time" id="scheduleStartTime" name="scheduleStartTime" 
+                   value="<?php echo htmlspecialchars($scheduleStartTime); ?>" required>
             
             <label for="scheduleEndTime">End Time:</label>
-            <input type="time" id="scheduleEndTime" name="scheduleEndTime" value="<?php echo htmlspecialchars($scheduleEndTime); ?>" required>
+            <input type="time" id="scheduleEndTime" name="scheduleEndTime" 
+                   value="<?php echo htmlspecialchars($scheduleEndTime); ?>" required>
             
             <label for="engineerID">Engineer:</label>
             <select id="engineerID" name="engineerID" required>
                 <option value="">-- Select Engineer --</option>
                 <?php foreach ($engineers as $eng): ?>
-                    <option value="<?php echo $eng['engineerID']; ?>" <?php if ($eng['engineerID'] == $engineerID) echo "selected"; ?>>
+                    <option value="<?php echo $eng['engineerID']; ?>" 
+                        <?php if ($eng['engineerID'] == $engineerID) echo "selected"; ?>>
                         <?php echo htmlspecialchars($eng['engineerFirstName'] . " " . $eng['engineerLastName']); ?>
                     </option>
                 <?php endforeach; ?>
@@ -228,28 +250,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <select id="clientID" name="clientID" required>
                 <option value="">-- Select Client --</option>
                 <?php foreach ($clients as $client): ?>
-                    <option value="<?php echo $client['clientID']; ?>" <?php if ($client['clientID'] == $clientID) echo "selected"; ?>>
+                    <option value="<?php echo $client['clientID']; ?>" 
+                        <?php if ($client['clientID'] == $clientID) echo "selected"; ?>>
                         <?php echo htmlspecialchars($client['clientFirstName'] . " " . $client['clientLastName']); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
             
             <label for="scheduleJobType">Job Type:</label>
-            <input type="text" id="scheduleJobType" name="scheduleJobType" value="<?php echo htmlspecialchars($scheduleJobType); ?>" required>
+            <input type="text" id="scheduleJobType" name="scheduleJobType" 
+                   value="<?php echo htmlspecialchars($scheduleJobType); ?>" required>
             
             <label for="scheduleIsAnnualService">Annual Service:</label>
-            <input type="checkbox" id="scheduleIsAnnualService" name="scheduleIsAnnualService" <?php if($scheduleIsAnnualService) echo 'checked'; ?>>
+            <input type="checkbox" id="scheduleIsAnnualService" name="scheduleIsAnnualService"
+                <?php if($scheduleIsAnnualService) echo 'checked'; ?>>
             
             <label for="scheduleStatus">Status:</label>
-            <input type="text" id="scheduleStatus" name="scheduleStatus" value="<?php echo htmlspecialchars($scheduleStatus); ?>" required>
+            <input type="text" id="scheduleStatus" name="scheduleStatus" 
+                   value="<?php echo htmlspecialchars($scheduleStatus); ?>" required>
             
             <label for="scheduleDetails">Details:</label>
-            <textarea id="scheduleDetails" name="scheduleDetails" required><?php echo htmlspecialchars($scheduleDetails); ?></textarea>
+            <textarea id="scheduleDetails" name="scheduleDetails" required><?php
+                echo htmlspecialchars($scheduleDetails);
+            ?></textarea>
             
             <label for="scheduleNotes">Notes:</label>
-            <textarea id="scheduleNotes" name="scheduleNotes"><?php echo htmlspecialchars($scheduleNotes); ?></textarea>
+            <textarea id="scheduleNotes" name="scheduleNotes"><?php
+                echo htmlspecialchars($scheduleNotes);
+            ?></textarea>
             
-            <!-- THE PLACEHOLDER FOR FILE UPLOAD!! -->
+            <!-- PLACEHOLDER FOR FILE UPLOAD -->
             <label for="scheduleFile">Add File (placeholder):</label>
             <input type="file" id="scheduleFile" name="scheduleFile">
             

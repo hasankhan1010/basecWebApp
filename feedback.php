@@ -113,7 +113,7 @@ if ($result) {
             $action = "";
             if (empty($entry['feedbackRating'])) {
                 $subject = rawurlencode("BASecurity Feedback Survey");
-                $body = rawurlencode("Dear " . $clientName . ",\n\nPlease provide your feedback for your recent job (" . $jobType . ") by visiting the link below:\n\nhttp://yourdomain.com/feedbackSurvey.php?jobID=" . $entry['scheduleID'] . "\n\nThank you!");
+                $body = rawurlencode("Dear " . $clientName . ",\n\nPlease provide your feedback for your recent job (" . $jobType . ") by visiting the link below:\n\nhttp://basecuritywebapp-g6g4hjcaeccva7gz.uksouth-01.azurewebsites.net/feedbackSurvey.php?jobID=" . $entry['scheduleID'] . "\n\nThank you!");
                 $mailto = "mailto:" . htmlspecialchars($entry['clientEmail']) . "?subject={$subject}&body={$body}";
                 $action = "<a href='{$mailto}' class='email-link'>Send Survey</a>";
             } else {
