@@ -68,7 +68,7 @@ if (isset($_GET['hour'])) {
 
 // IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERRIDE ANY GET PRE-FILLS)
 if ($scheduleID > 0 && $conn) {
-    // Explicitly list columns instead of SELECT *
+    // LIST COLUMNS INSTEAD OF SELECT - FASTER AND MORE EFFICIENT *
     $query = "SELECT
                 scheduleDate,
                 scheduleStartTime,
@@ -86,7 +86,7 @@ if ($scheduleID > 0 && $conn) {
     $stmt->bind_param("i", $scheduleID);
     $stmt->execute();
 
-    // Use store_result() + bind_result() instead of get_result()
+    // USE STORE RESULT AND GET RESULT INSTEAD OF THE OTHER ONE 
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $stmt->bind_result(
@@ -186,7 +186,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->close();
     }
 
-    // Redirect back to main schedule diary page
+    // REDIRECT 
     header("Location: scheduleDiary.php");
     exit();
 }
