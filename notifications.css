@@ -1,21 +1,18 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body & Base Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
   line-height: 1.6;
 }
 
-/* Navigation Bar */
 .navbar {
-  background-color: #ffa500; /* Orange */
+  background-color: #ffa500;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,14 +35,12 @@ body {
   border-radius: 4px;
 }
 
-/* Container */
 .container {
   max-width: 1000px;
   margin: 20px auto;
   padding: 0 15px;
 }
 
-/* Headings */
 h1,
 h2 {
   text-align: center;
@@ -53,7 +48,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* Logged In User Section */
 .logged-in-user {
   background-color: #fff;
   padding: 15px;
@@ -63,7 +57,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* Search & Refresh Section */
 .search-refresh {
   display: flex;
   justify-content: center;
@@ -91,7 +84,6 @@ h2 {
   background-color: #e69500;
 }
 
-/* Notifications List Table */
 .notifications-list table {
   width: 100%;
   border-collapse: collapse;
@@ -111,7 +103,6 @@ h2 {
   color: #fff;
 }
 
-/* Action Button */
 .action-btn {
   display: inline-block;
   padding: 6px 12px;
@@ -125,12 +116,10 @@ h2 {
   background-color: #e69500;
 }
 
-/* Checkbox Styling */
 .read-checkbox {
   transform: scale(1.2);
 }
 
-/* Footer */
 footer {
   background-color: #f5f5f5;
   text-align: center;

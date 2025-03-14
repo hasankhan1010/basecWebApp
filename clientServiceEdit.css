@@ -1,21 +1,19 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Base Body Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
   line-height: 1.6;
 }
 
-/* Navigation Bar */
+/* NNAV BAR */
 .navbar {
-  background-color: #ffa500; /* Orange */
+  background-color: #ffa500;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,21 +39,18 @@ body {
   border-radius: 4px;
 }
 
-/* Container */
 .container {
   max-width: 1000px;
   margin: 20px auto;
   padding: 0 15px;
 }
 
-/* Headings */
 h1 {
   text-align: center;
   color: #ffa500;
   margin-bottom: 20px;
 }
 
-/* Fieldset Styling */
 fieldset {
   border: 1px solid #ccc;
   padding: 15px;
@@ -70,7 +65,6 @@ legend {
   color: #ffa500;
 }
 
-/* Form Rows */
 .form-row {
   display: flex;
   flex-wrap: wrap;
@@ -90,7 +84,7 @@ legend {
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-bottom: 5px;
-  min-width: 0; /* so it can shrink if needed */
+  min-width: 0; /* CAN SHRINK IF NEEDED - SAVE THISSS */
 }
 
 textarea {
@@ -99,12 +93,12 @@ textarea {
 
 /* Job History Table */
 .table-responsive {
-  overflow-x: auto; /* Horizontal scroll if table is too wide */
+  overflow-x: auto; /* ONLY IF TOO WIDE - HORIZONTAL SCROLL */
 }
 
 table {
   width: 100%;
-  table-layout: fixed; /* Allows word-wrap in columns */
+  table-layout: fixed;
   border-collapse: collapse;
   margin-top: 10px;
 }
@@ -124,7 +118,6 @@ th {
   color: #fff;
 }
 
-/* Form Actions */
 .form-actions {
   text-align: center;
   margin-top: 20px;
@@ -144,7 +137,6 @@ th {
   background-color: #e69500;
 }
 
-/* Client Files Section */
 .client-files {
   margin-top: 20px;
   padding: 15px;
@@ -176,7 +168,6 @@ th {
   margin-bottom: 10px;
 }
 
-/* Footer */
 footer {
   background-color: #f5f5f5;
   text-align: center;

@@ -32,7 +32,7 @@ $startDate = $monday->format('Y-m-d');
 $endDate   = $sunday->format('Y-m-d');
 
 //  RETRIEVE THE ENTRIES, FOR THE WHOLE WEEK USING A PREPARED STATEMENT
-$query = "SELECT * FROM SurveyDiary WHERE surveyDate BETWEEN ? AND ?";
+$query = "SELECT * FROM surveydiary WHERE surveyDate BETWEEN ? AND ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param("ss", $startDate, $endDate);
 $stmt->execute();

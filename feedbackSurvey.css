@@ -1,20 +1,17 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* General Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
   text-align: center;
   padding: 20px;
 }
 
-/* Container */
 .container {
   max-width: 500px;
   margin: auto;
@@ -24,13 +21,11 @@ body {
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Headings */
 h1 {
   color: #ffa500;
   margin-bottom: 20px;
 }
 
-/* Rating Stars */
 .rating {
   font-size: 2em;
   color: gray;
@@ -47,7 +42,6 @@ h1 {
   color: #ffa500;
 }
 
-/* Feedback Form */
 label {
   font-weight: bold;
   display: block;
@@ -62,7 +56,7 @@ textarea {
   resize: vertical;
 }
 
-/* Submit Button */
+/* DO THE SUBMIT BUTTON */
 button {
   display: block;
   width: 100%;
@@ -81,7 +75,7 @@ button:hover {
   background: #e69500;
 }
 
-/* Success, Error, Info Messages */
+/* SUCCESS, ERROR, INFO MESSAGES */
 .success {
   color: green;
   font-weight: bold;

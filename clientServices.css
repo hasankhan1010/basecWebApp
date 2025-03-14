@@ -1,20 +1,18 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
 }
 
-/* Navigation Bar */
+/* NNAV BAR */
 .navbar {
-  background-color: #ffa500; /* Orange */
+  background-color: #ffa500; /* ORANGE */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -40,14 +38,14 @@ body {
   border-radius: 4px;
 }
 
-/* Container */
+/* THE CONTAINER */
 .container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 20px;
 }
 
-/* Header & Search */
+/* HEADER AND SEARCH */
 header {
   text-align: center;
   margin-bottom: 20px;
@@ -88,7 +86,7 @@ header h1 {
   background-color: #e69500;
 }
 
-/* Clients List Table */
+/* CLIENTS LIST TABLE */
 .clients-list table {
   width: 100%;
   border-collapse: collapse;

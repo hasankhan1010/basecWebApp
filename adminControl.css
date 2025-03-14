@@ -1,11 +1,9 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Base Body Styling */
 body {
   font-family: Arial, sans-serif;
   background-color: #f0ead6; /* Eggshell white */
@@ -13,7 +11,7 @@ body {
   line-height: 1.6;
 }
 
-/* Navigation Bar */
+/* NNAV BAR */
 .navbar {
   background-color: #ffa500; /* Orange */
   display: flex;
@@ -38,14 +36,12 @@ body {
   border-radius: 4px;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 15px;
 }
 
-/* Headings */
 h1,
 h2,
 h3 {
@@ -54,7 +50,6 @@ h3 {
   margin-bottom: 20px;
 }
 
-/* Section Styling */
 section {
   margin-bottom: 40px;
   background-color: #fff;
@@ -63,7 +58,6 @@ section {
   border-radius: 8px;
 }
 
-/* Form Styling */
 form {
   margin-bottom: 20px;
 }
@@ -100,7 +94,6 @@ form button:hover {
   background-color: #e69500;
 }
 
-/* User Forms and Tables */
 .user-forms,
 .client-forms {
   margin-bottom: 30px;
@@ -122,7 +115,7 @@ table th {
   color: #fff;
 }
 
-/* Delete Button */
+/* DELETE BUTTON */
 .delete-btn {
   display: inline-block;
   padding: 6px 12px;
@@ -136,7 +129,7 @@ table th {
   background-color: #990000;
 }
 
-/* Active Users Section */
+/* ACTIVE USERS SECTION */
 .active-users-section {
   margin-top: 20px;
 }
@@ -155,7 +148,7 @@ table th {
   color: #fff;
 }
 
-/* System Log Section */
+/* SYSTEM LOG SECTION */
 .system-log table {
   width: 100%;
   border-collapse: collapse;
@@ -172,7 +165,6 @@ table th {
   color: #fff;
 }
 
-/* Footer */
 footer {
   background-color: #f5f5f5;
   text-align: center;

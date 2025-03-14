@@ -1,21 +1,19 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Base Body Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
   line-height: 1.6;
 }
 
-/* Navigation Bar */
+/* NNAV BAR */
 .navbar {
-  background-color: #ffa500; /* Orange */
+  background-color: #ffa500;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -38,21 +36,18 @@ body {
   border-radius: 4px;
 }
 
-/* Container */
 .container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 20px;
 }
 
-/* Heading */
 h1 {
   text-align: center;
   color: #ffa500;
   margin-bottom: 20px;
 }
 
-/* Search & Refresh Section */
 .search-refresh {
   display: flex;
   justify-content: center;
@@ -80,7 +75,6 @@ h1 {
   background-color: #e69500;
 }
 
-/* Payments Table */
 .payments-table {
   width: 100%;
   border-collapse: collapse;
@@ -100,7 +94,6 @@ h1 {
   color: #fff;
 }
 
-/* Inputs */
 .amount-input {
   width: 100%;
   padding: 6px;
@@ -110,14 +103,13 @@ h1 {
 
 .notes-input {
   width: 100%;
-  height: 80px; /* Increase height for multi-line input */
+  height: 80px; /* INCREASED THE HEIGHT FOR MULTI-LINE INPUT */
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
 }
 
-/* Form Actions */
 .form-actions {
   text-align: center;
   margin-top: 20px;
@@ -135,7 +127,6 @@ h1 {
   background-color: #e69500;
 }
 
-/* Footer */
 footer {
   background-color: #f5f5f5;
   text-align: center;

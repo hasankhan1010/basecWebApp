@@ -1,20 +1,18 @@
-/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Body & Overall Styling */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0ead6; /* Eggshell white */
+  background-color: #f0ead6;
   color: #333;
 }
 
-/* Navigation Bar */
+/* NNAV BAR */
 .navbar {
-  background-color: #ffa500; /* Orange */
+  background-color: #ffa500;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,14 +32,12 @@ body {
   border-radius: 4px;
 }
 
-/* Survey Diary Container */
 .survey-diary-container {
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 20px;
 }
 
-/* Header & Week Navigation */
 header h1 {
   text-align: center;
   margin-bottom: 10px;
@@ -68,7 +64,7 @@ header h1 {
   font-weight: bold;
 }
 
-/* Timetable Styles */
+/* DO THE TIMETABLE STYLE */
 .timetable {
   width: 100%;
   border-collapse: collapse;
@@ -97,7 +93,6 @@ header h1 {
   color: #aaa;
 }
 
-/* Modal Popup */
 .modal {
   display: none;
   position: fixed;

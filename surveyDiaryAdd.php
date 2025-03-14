@@ -25,7 +25,7 @@ if (isset($_GET['hour'])) {
 
 // EDITING EXISTING ENTRIES - LOAD THE VALUES 
 if ($surveyID && $conn) {
-    $query = "SELECT * FROM SurveyDiary WHERE surveyID = ?";
+    $query = "SELECT * FROM surveydiary WHERE surveyID = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $surveyID);
     $stmt->execute();
@@ -51,14 +51,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     if ($surveyID) {
         // UPDATE THE EXISTING RECORD 
-        $query = "UPDATE SurveyDiary SET surveyDate=?, surveyTime=?, surveyCreatedByID=?, surveyNotes=?, surveyStatus=? WHERE surveyID=?";
+        $query = "UPDATE surveydiary SET surveyDate=?, surveyTime=?, surveyCreatedByID=?, surveyNotes=?, surveyStatus=? WHERE surveyID=?";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sssssi", $surveyDate, $surveyTime, $surveyCreatedByID, $surveyNotes, $surveyStatus, $surveyID);
         $stmt->execute();
         $stmt->close();
     } else {
         // INSERT THE NEW RECORD 
-        $query = "INSERT INTO SurveyDiary (surveyDate, surveyTime, surveyCreatedByID, surveyNotes, surveyStatus) VALUES (?, ?, ?, ?, ?)";
+        $query = "INSERT INTO surveydiary (surveyDate, surveyTime, surveyCreatedByID, surveyNotes, surveyStatus) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($query);
         $stmt->bind_param("sssss", $surveyDate, $surveyTime, $surveyCreatedByID, $surveyNotes, $surveyStatus);
         $stmt->execute();
