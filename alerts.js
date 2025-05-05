@@ -1,5 +1,6 @@
 // alerts.js
 // Global reminder pop-ups for any page
+
 (function () {
   // thresholds in seconds - show at exactly 1 day, 1 hour, 1 minute, and 10 seconds
   const THRESHOLDS = [86400, 3600, 60, 10];
@@ -119,6 +120,7 @@
   document.head.appendChild(style);
 
   // create and show pop-up
+
   function showPopup(reminder, timeLabel) {
     if (document.getElementById("reminder-popup")) return;
 
@@ -144,11 +146,11 @@
       minute: '2-digit'
     });
     
-    // Determine reminder type
+    // Determine reminder type! - pretty neat
     const reminderType = reminder.isAnnual == 1 ? 'Annual' : 'Custom';
     const typeClass = reminder.isAnnual == 1 ? 'annual' : 'custom';
 
-    // container
+    // container! - so cool
     const popup = document.createElement("div");
     popup.id = "reminder-popup";
     popup.className = "reminder-popup";
@@ -253,7 +255,7 @@
           const result = await response.json();
           
           if (result.success) {
-            // Show confirmation message
+            // Show confirmation message! - pretty neat
             const confirmDiv = document.createElement('div');
             confirmDiv.className = 'notification';
             confirmDiv.textContent = `Reminder rescheduled for ${new Date(result.newDueDate).toLocaleString()}`;
@@ -266,7 +268,7 @@
               }
             }, 5000);
             
-            // Close the popup
+            // Close the popup! - love this part
             document.body.removeChild(popup);
           }
         } catch (error) {
@@ -316,7 +318,7 @@
             
             console.log(`Showing reminder popup for ${reminder.serviceName} due in ${timeLabel}`);
             
-            // Pass the entire reminder object to showPopup
+            // Pass the entire reminder object to showPopup! - omg
             showPopup(reminder, timeLabel);
             alerted.add(key);
           }

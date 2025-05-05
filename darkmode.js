@@ -1,4 +1,5 @@
 // darkmode.js
+
 // Handles dark mode functionality across all pages
 
 (function () {

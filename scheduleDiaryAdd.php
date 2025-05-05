@@ -7,22 +7,23 @@ if (!isset($_SESSION['user'])) {
 
 include('database.php');
 
-/*
-  EXPECTED COLUMNS IN SCHEDULE DIARY:
-    scheduleID (INT, PK)
-    scheduleDate (DATE)
-    scheduleStartTime (TIME)
-    scheduleEndTime (TIME)
-    engineerID (INT) -- FK to Engineer(engineerID)
-    clientID (INT)   -- FK to Clients(clientID)
-    scheduleJobType (VARCHAR)
-    scheduleIsAnnualService (TINYINT/BOOLEAN)
-    scheduleStatus (VARCHAR)
-    scheduleDetails (TEXT/VARCHAR)
-    scheduleNotes (TEXT/VARCHAR)
-*/
+/**
+ * EXPECTED COLUMNS IN SCHEDULE DIARY:
+ *     scheduleID (INT, PK)
+ *     scheduleDate (DATE)
+ *     scheduleStartTime (TIME)
+ *     scheduleEndTime (TIME)
+ *     engineerID (INT) -- FK to Engineer(engineerID)
+ *     clientID (INT)   -- FK to Clients(clientID)
+ *     scheduleJobType (VARCHAR)
+ *     scheduleIsAnnualService (TINYINT/BOOLEAN)
+ *     scheduleStatus (VARCHAR)
+ *     scheduleDetails (TEXT/VARCHAR)
+ *     scheduleNotes (TEXT/VARCHAR)
+ */
 
 // LOAD THE LIST OF VALID ENGINEERS IN A DROP-DOWN
+!
 $engineers = [];
 $engQuery = "SELECT engineerID, engineerFirstName, engineerLastName FROM Engineer";
 $engResult = mysqli_query($conn, $engQuery);
@@ -33,6 +34,7 @@ if ($engResult) {
 }
 
 // THE SAME BUT WITH THE CLIENTS
+
 $clients = [];
 $clientQuery = "SELECT clientID, clientFirstName, clientLastName FROM Clients";
 $clientResult = mysqli_query($conn, $clientQuery);
@@ -43,6 +45,7 @@ if ($clientResult) {
 }
 
 // THE VARIABLES - INITIALIZE
+
 $scheduleID              = isset($_GET['scheduleID']) ? intval($_GET['scheduleID']) : 0;
 $scheduleDate            = "";
 $scheduleStartTime       = "";
@@ -50,18 +53,18 @@ $scheduleEndTime         = "";
 $engineerID              = "";
 $clientID                = "";
 $scheduleJobType         = "";
-$scheduleIsAnnualService = 0; // 0 = FALSE, 1 = TRUE
+$scheduleIsAnnualService = 0; // 0 = FALSE, 1 = TRUE!
 $scheduleStatus          = "";
 $scheduleDetails         = "";
 $scheduleNotes           = "";
 
-// Get schedule files
+// Get schedule files!
 $files = [];
 if ($scheduleID > 0) {
-    // Check if ScheduleFiles table exists
+    // Check if ScheduleFiles table exists!
     $tableCheck = $conn->query("SHOW TABLES LIKE 'ScheduleFiles'");
     if ($tableCheck && $tableCheck->num_rows === 0) {
-        // Create ScheduleFiles table if it doesn't exist
+        // Create ScheduleFiles table if it doesn't exist!
         $sql = "CREATE TABLE IF NOT EXISTS ScheduleFiles (
             fileID INT(11) NOT NULL AUTO_INCREMENT,
             scheduleID INT(11) NOT NULL,
@@ -76,7 +79,7 @@ if ($scheduleID > 0) {
         $conn->query($sql);
     }
     
-    // Get files for this schedule entry
+    // Get files for this schedule entry!
     $fileStmt = $conn->prepare("SELECT * FROM ScheduleFiles WHERE scheduleID = ? ORDER BY fileDateTime DESC");
     if ($fileStmt) {
         $fileStmt->bind_param("i", $scheduleID);
@@ -89,7 +92,7 @@ if ($scheduleID > 0) {
     }
 }
 
-// PRE-FILL FROM CLICKED SLOT IF CREATING A NEW ENTRY
+// PRE-FILL FROM CLICKED SLOT IF CREATING A NEW ENTRY!
 if (isset($_GET['date'])) {
     $scheduleDate = $_GET['date'];
 }
@@ -100,9 +103,9 @@ if (isset($_GET['hour'])) {
     }
 }
 
-// IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERRIDE ANY GET PRE-FILLS)
+// IF EDITING EXISTING ENTRY - LOAD VALUES FROM DB (OVERRIDE ANY GET PRE-FILLS)! - love this part
 if ($scheduleID > 0 && $conn) {
-    // LIST COLUMNS INSTEAD OF SELECT - FASTER AND MORE EFFICIENT *
+    // LIST COLUMNS INSTEAD OF SELECT - FASTER AND MORE EFFICIENT *!
     $query = "SELECT
                 scheduleDate,
                 scheduleStartTime,
@@ -120,7 +123,7 @@ if ($scheduleID > 0 && $conn) {
     $stmt->bind_param("i", $scheduleID);
     $stmt->execute();
 
-    // USE STORE RESULT AND GET RESULT INSTEAD OF THE OTHER ONE 
+    // USE STORE RESULT AND GET RESULT INSTEAD OF THE OTHER ONE !
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $stmt->bind_result(
@@ -140,7 +143,7 @@ if ($scheduleID > 0 && $conn) {
     $stmt->close();
 }
 
-// PROCESS FORM SUBMISSION
+// PROCESS FORM SUBMISSION!
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleID              = isset($_POST['scheduleID']) ? intval($_POST['scheduleID']) : 0;
     $scheduleDate            = $_POST['scheduleDate'];
@@ -155,13 +158,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $scheduleNotes           = $_POST['scheduleNotes'];
     $createReminder          = isset($_POST['createReminder']) ? 1 : 0;
     
-    // Force job type to be Annual Service if the toggle is on
+    // Force job type to be Annual Service if the toggle is on!
     if ($scheduleIsAnnualService) {
         $scheduleJobType = 'Annual Service';
     }
     
-    // Check if there are any existing entries at the same time slot (for overwriting)
-    if ($scheduleID == 0) { // Only check for new entries
+    // Check if there are any existing entries at the same time slot (for overwriting)!
+    if ($scheduleID == 0) { // Only check for new entries! - so cool
         $checkQuery = "SELECT scheduleID FROM ScheduleDiary WHERE scheduleDate = ? AND 
                       ((scheduleStartTime <= ? AND scheduleEndTime > ?) OR 
                        (scheduleStartTime < ? AND scheduleEndTime >= ?))";
@@ -171,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $checkResult = $checkStmt->get_result();
         
         if ($checkResult->num_rows > 0) {
-            // Get the first conflicting entry to overwrite
+            // Get the first conflicting entry to overwrite!
             $conflictRow = $checkResult->fetch_assoc();
             $scheduleID = $conflictRow['scheduleID'];
         }
@@ -179,25 +182,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $checkStmt->close();
     }
     
-    // Handle file upload
+    // Handle file upload!
     if (isset($_FILES['scheduleFile']) && $_FILES['scheduleFile']['error'] === UPLOAD_ERR_OK) {
         $fileName = basename($_FILES['scheduleFile']['name']);
         $fileType = $_FILES['scheduleFile']['type'];
         $fileSize = $_FILES['scheduleFile']['size'];
         $targetDir = "uploads/";
         
-        // Create directory if it doesn't exist
+        // Create directory if it doesn't exist! - love this part
         if (!file_exists($targetDir)) {
             mkdir($targetDir, 0755, true);
         }
         
-        // Generate unique filename to prevent overwriting
+        // Generate unique filename to prevent overwriting!
         $uniqueFileName = time() . '_' . $fileName;
         $targetFile = $targetDir . $uniqueFileName;
         
-        // Move the uploaded file to the target directory
+        // Move the uploaded file to the target directory!
         if (move_uploaded_file($_FILES['scheduleFile']['tmp_name'], $targetFile)) {
-            // Insert file info into database
+            // Insert file info into database!
             $stmt = $conn->prepare("INSERT INTO ScheduleFiles (scheduleID, fileName, fileType, filePath, fileSize) VALUES (?, ?, ?, ?, ?)");
             $stmt->bind_param("isssi", $scheduleID, $fileName, $fileType, $targetFile, $fileSize);
             $stmt->execute();
@@ -206,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     
     if ($scheduleID > 0) {
-        // UPDATE THE EXISTING RECORD
+        // UPDATE THE EXISTING RECORD!
         $query = "UPDATE ScheduleDiary
                   SET scheduleDate = ?,
                       scheduleStartTime = ?,
@@ -237,7 +240,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->execute();
         $stmt->close();
     } else {
-        // INSERT NEW RECORD
+        // INSERT NEW RECORD! - this is important
         $query = "INSERT INTO ScheduleDiary (
                     scheduleDate,
                     scheduleStartTime,
@@ -268,15 +271,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->close();
     }
 
-    // Create annual service reminder if requested
+    // Create annual service reminder if requested!
     if ($scheduleIsAnnualService && $createReminder && $scheduleID > 0) {
-        // Calculate the date for next year
+        // Calculate the date for next year!
         $reminderDate = date('Y-m-d', strtotime($scheduleDate . ' +1 year'));
         
-        // Check if Reminders table exists
+        // Check if Reminders table exists!
         $tableCheck = $conn->query("SHOW TABLES LIKE 'Reminders'");
         if ($tableCheck && $tableCheck->num_rows === 0) {
-            // Create Reminders table if it doesn't exist
+            // Create Reminders table if it doesn't exist! - love this part
             $sql = "CREATE TABLE IF NOT EXISTS Reminders (
                 reminderID INT(11) NOT NULL AUTO_INCREMENT,
                 clientID INT(11) NOT NULL,
@@ -291,7 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $conn->query($sql);
         }
         
-        // Insert the reminder
+        // Insert the reminder!
         $reminderType = 'Annual Service';
         $reminderDetails = "Annual service reminder for client #$clientID. Previous service on $scheduleDate.";
         $reminderStatus = 'Active';
@@ -302,7 +305,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $stmt->close();
     }
     
-    // Redirect to the new URL
+    // Redirect to the new URL!
     header("Location: scheduleDiary.php");
     exit();
 }
@@ -316,7 +319,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="fileUpload.css">
     <link rel="stylesheet" href="darkmode.css">
     <style>
-        /* Toggle button styling */
+        /**
+ * Toggle button styling
+ */
         .toggle-container {
             display: flex;
             align-items: center;
@@ -510,14 +515,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <script src="alerts.js"></script>
     <script src="darkmode.js"></script>
     <script>
-        // Function to handle annual service toggle
+        // Function to handle annual service toggle!
         function toggleAnnualService(isChecked) {
             const jobTypeField = document.getElementById('scheduleJobType');
             const reminderCheckbox = document.getElementById('createReminder');
             const reminderContainer = document.getElementById('reminderToggleContainer');
             
             if (isChecked) {
-                // Save the current value if it's not already Annual Service
+                // Save the current value if it's not already Annual Service!
                 if (jobTypeField.value !== 'Annual Service') {
                     jobTypeField.dataset.previousValue = jobTypeField.value;
                 }
@@ -525,12 +530,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 jobTypeField.readOnly = true;
                 jobTypeField.style.backgroundColor = '#f0f0f0';
                 
-                // Enable and check the reminder checkbox
+                // Enable and check the reminder checkbox! - this is important
                 reminderCheckbox.disabled = false;
                 reminderCheckbox.checked = true;
                 reminderContainer.style.opacity = '1';
             } else {
-                // Restore previous value if available
+                // Restore previous value if available!
                 if (jobTypeField.dataset.previousValue) {
                     jobTypeField.value = jobTypeField.dataset.previousValue;
                 } else {
@@ -539,14 +544,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 jobTypeField.readOnly = false;
                 jobTypeField.style.backgroundColor = '';
                 
-                // Disable and uncheck the reminder checkbox
+                // Disable and uncheck the reminder checkbox!
                 reminderCheckbox.disabled = true;
                 reminderCheckbox.checked = false;
                 reminderContainer.style.opacity = '0.5';
             }
         }
         
-        // Initialize on page load
+        // Initialize on page load!
         document.addEventListener('DOMContentLoaded', function() {
             const annualServiceCheckbox = document.getElementById('scheduleIsAnnualService');
             if (annualServiceCheckbox.checked) {

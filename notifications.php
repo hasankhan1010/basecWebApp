@@ -7,6 +7,7 @@ if (!isset($_SESSION['user'])) {
 }
 
 // Database connection
+!
 require_once 'database.php';
 if (!($conn instanceof mysqli)) {
     die('<p style="color:red; text-align:center;">Database connection failed.</p>');
@@ -24,6 +25,7 @@ $nextDate = (clone $selectedDate)->modify('+1 day')->format('Y-m-d');
 $displayDate = htmlspecialchars($selectedDate->format('l, F j, Y'), ENT_QUOTES);
 
 // 2) Fetch today's jobs + client addresses
+!
 $jobs = [];
 $sql = "
   SELECT sd.ScheduleStartTime, c.clientFirstName, c.clientLastName, c.clientAddress1, c.clientAddress2
@@ -47,6 +49,7 @@ if ($stmt = $conn->prepare($sql)) {
 }
 
 // 3) Encode jobs for JavaScript
+!
 $jobsJson = json_encode($jobs, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT) ?: '[]';
 $apiKey = 'AIzaSyATOYFbuh6knVD6DmCPbpPwqxODprL9uCs';
 ?>
@@ -74,7 +77,8 @@ $apiKey = 'AIzaSyATOYFbuh6knVD6DmCPbpPwqxODprL9uCs';
 
   <!-- Google Maps JS API -->
   <script
-    src="https://maps.googleapis.com/maps/api/js?key=<?= $apiKey ?>&callback=initMap"
+    src="https:// maps.googleapis.com/maps/api/js?key=<?= $apiKey ?>&callback=initMap"
+! - omg
     async defer>
   </script>
   <script>
@@ -118,6 +122,7 @@ $apiKey = 'AIzaSyATOYFbuh6knVD6DmCPbpPwqxODprL9uCs';
     }
 
     // Re-init map when navigating back/forward
+! - omg
     window.addEventListener('pageshow', e => {
       if (e.persisted) initMap();
     });

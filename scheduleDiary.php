@@ -31,9 +31,11 @@ $startDate = $monday->format('Y-m-d');
 $endDate   = $sunday->format('Y-m-d');
 
 
-//ALL THE ABOVE IS BASICALLY THE SAME FROM THE SURVEY DIARY !!!!!!!!!!!!!!!!!!!!11
+// ALL THE ABOVE IS BASICALLY THE SAME FROM THE SURVEY DIARY !!!!!!!!!!!!!!!!!!!!11
+!
 
 // Check if Engineers table exists
+
 $engineersTableExists = false;
 $clientsTableExists = false;
 
@@ -48,6 +50,7 @@ while ($row = $tablesResult->fetch_array()) {
 }
 
 // RETRIEVE THE ENTRIES WITH ENGINEER AND CLIENT NAMES IF TABLES EXIST
+!
 if ($engineersTableExists && $clientsTableExists) {
     $query = "SELECT sd.*, 
               e.engineerFirstName, e.engineerLastName,
@@ -58,6 +61,7 @@ if ($engineersTableExists && $clientsTableExists) {
               WHERE sd.scheduleDate BETWEEN ? AND ?";
 } else {
     // Fallback query if tables don't exist
+!
     $query = "SELECT * FROM ScheduleDiary WHERE scheduleDate BETWEEN ? AND ?";
 }
 
@@ -69,20 +73,25 @@ $result = $stmt->get_result();
 $schedules = [];
 while ($row = $result->fetch_assoc()) {
 
-    //IF COLUMN NAME STORED WITH A DIFF CASE, ADJUST IT ACCORDINGLU - USER MAUAL!!!!!!
+    // IF COLUMN NAME STORED WITH A DIFF CASE, ADJUST IT ACCORDINGLU - USER MAUAL!!!!!!
+!
     $startTime = isset($row['ScheduleStartTime']) ? $row['ScheduleStartTime'] : $row['scheduleStartTime'];
     $endTime = isset($row['ScheduleEndTime']) ? $row['ScheduleEndTime'] : $row['scheduleEndTime'];
     
     // Extract hours for duration calculation
+!
     $startHour = (int)substr($startTime, 0, 2);
     $endHour = (int)substr($endTime, 0, 2);
     
     // Handle case where end time is on the same day but later hour
+!
     if ($endHour <= $startHour) {
         $endHour = $startHour + 1; // Default to 1 hour if end time is invalid
+!
     }
     
     // Add the entry to all hour slots it spans
+!
     for ($hour = $startHour; $hour < $endHour; $hour++) {
         $key = $row['scheduleDate'] . '_' . sprintf("%02d", $hour);
         if (!isset($schedules[$key])) {
@@ -100,7 +109,8 @@ $stmt->close();
     <title>Schedule Diary</title>
     <link rel="stylesheet" href="scheduleDiary.css">
     <link rel="stylesheet" href="darkmode.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https:// cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+! - love this part
     <script>
       
       document.addEventListener("DOMContentLoaded", function() {
@@ -117,6 +127,7 @@ $stmt->close();
                   if (data && data.length > 0) {
                       data.forEach(function(entry) {
                           // Safely get values with fallbacks
+!
                           var jobType = entry.scheduleJobType || 'Task';
                           var status = entry.scheduleStatus || 'Unknown';
                           var engineerId = entry.engineerID || '0';
@@ -135,6 +146,7 @@ $stmt->close();
                           
                           content += "<div class='entry-details'>";
                           // Get engineer name if available, otherwise show ID
+!
                           var engineerName = "";
                           if (entry.engineerFirstName && entry.engineerLastName) {
                               engineerName = entry.engineerFirstName + " " + entry.engineerLastName;
@@ -143,6 +155,7 @@ $stmt->close();
                           }
                           
                           // Get client name if available, otherwise show ID
+!
                           var clientName = "";
                           if (entry.clientFirstName && entry.clientLastName) {
                               clientName = entry.clientFirstName + " " + entry.clientLastName;
@@ -182,12 +195,15 @@ $stmt->close();
                   var datePart = parts[0];
                   var hourPart = parts[1];
                   // Update the Add New Entry button
+!
                   var addButton = document.getElementById("editButton");
                   if (data && data.length > 0) {
                       // If there are entries, change the button text to indicate it will create a new entry
+! - love this part
                       addButton.textContent = "Add New Entry";
                   } else {
                       // If no entries, it's a simple add
+!
                       addButton.textContent = "Add Entry";
                   }
                   addButton.href = "scheduleDiaryAdd.php?date=" + encodeURIComponent(datePart) + "&hour=" + encodeURIComponent(hourPart);
@@ -272,6 +288,7 @@ $stmt->close();
                             if (isset($schedules[$key])) {
                                 foreach ($schedules[$key] as $schedule) {
                                     // Safely get schedule details with error checking
+!
                                     $details = isset($schedule['scheduleDetails']) ? $schedule['scheduleDetails'] : '';
                                     $details = htmlspecialchars($details);
                                     if (strlen($details) > 40) {
@@ -279,9 +296,11 @@ $stmt->close();
                                     }
                                     
                                     // Safely get schedule status
+!
                                     $scheduleStatus = isset($schedule['scheduleStatus']) ? $schedule['scheduleStatus'] : 'Unknown';
                                     
                                     // Determine status class for visual indicator
+! - love this part
                                     $statusClass = '';
                                     $status = strtolower($scheduleStatus);
                                     if (strpos($status, 'complete') !== false) {
@@ -295,9 +314,11 @@ $stmt->close();
                                     }
                                     
                                     // Safely get job type
+!
                                     $scheduleJobType = isset($schedule['scheduleJobType']) ? $schedule['scheduleJobType'] : 'Task';
                                     
                                     // Determine icon based on job type
+! - omg
                                     $icon = 'fa-tools';
                                     $jobType = strtolower($scheduleJobType);
                                     if (strpos($jobType, 'annual') !== false) {
@@ -313,6 +334,7 @@ $stmt->close();
                                     }
                                     
                                     // Safely get time values
+!
                                     $startTime = isset($schedule['scheduleStartTime']) ? substr($schedule['scheduleStartTime'], 0, 5) : '00:00';
                                     $endTime = isset($schedule['scheduleEndTime']) ? substr($schedule['scheduleEndTime'], 0, 5) : '00:00';
                                     

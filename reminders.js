@@ -64,6 +64,7 @@
   }
 
   // Initialize polling
+
   $(function () {
     pollReminders();
     setInterval(pollReminders, POLL_INTERVAL_MS);
