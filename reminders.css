@@ -1,0 +1,822 @@
+/* reminders.css - Professional styling for reminders page including navbar */
+
+:root {
+  --primary: #ffa500;
+  --primary-dark: #e69500;
+  --background: #f9f3e7;
+  --surface: #ffffff;
+  --text: #333333;
+  --border: #cccccc;
+  --input-bg: #ffffff;
+  --input-border: #cccccc;
+  --input-focus: #ffa500;
+  --row-alt: #f8f9fa;
+}
+
+/* Navbar (match other pages) */
+.navbar {
+  background-color: var(--primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+}
+.navbar .nav-left,
+.navbar .nav-right {
+  display: flex;
+  align-items: center;
+}
+.navbar a {
+  color: #fff;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  margin-right: 0.5rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+.navbar a:hover,
+.navbar a.active {
+  background-color: var(--primary-dark);
+  border-radius: 0.25rem;
+}
+
+/* Page container */
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 0.5rem;
+}
+
+h1 {
+  margin-top: 1.5rem;
+  text-align: center;
+  color: var(--primary);
+  font-size: 2rem;
+}
+
+/* Notification banner */
+.notification {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Form styling */
+.form-group {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin: 2rem 0;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-field {
+  flex: 1;
+  min-width: 250px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-width .form-field {
+  width: 100%;
+}
+
+.form-group label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.input-field {
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--input-border);
+  border-radius: 0.5rem;
+  background-color: var(--input-bg);
+  transition: border-color 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.input-field:focus {
+  border-color: var(--input-focus);
+  outline: none;
+}
+
+/* Toggle Switch Styling */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toggle-label {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.toggle-text {
+  font-size: 0.9rem;
+  color: #666;
+  min-width: 30px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 24px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* Button styling */
+.button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.button:hover {
+  background-color: var(--primary-dark);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+/* Table styling */
+.table-responsive {
+  overflow-x: auto;
+  margin-bottom: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.reminders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--surface);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+thead {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+th,
+td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+  vertical-align: top;
+}
+
+/* Reminder type styling */
+.reminder-type {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.reminder-type.annual {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.reminder-type.custom {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+/* Date and time styling */
+.due-date {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.due-time {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Notes styling */
+.notes-content {
+  max-height: 100px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background-color: #f9f9f9;
+  border-radius: 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.no-notes, .no-client {
+  font-style: italic;
+  color: #999;
+  font-size: 0.85rem;
+}
+
+.no-reminders {
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
+  color: #666;
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--row-alt);
+}
+
+/* Pop-up alert */
+#reminder-popup {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  max-width: 400px;
+  width: 90%;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
+
+.popup-header {
+  background-color: var(--primary);
+  color: white;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.popup-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.popup-close {
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.popup-content {
+  padding: 15px;
+  text-align: left;
+}
+
+.popup-time {
+  font-weight: bold;
+  color: #e74c3c;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.popup-service {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.popup-client {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.popup-date {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.popup-type {
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.popup-type .reminder-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-left: 5px;
+}
+
+.popup-notes {
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  color: #555;
+  max-height: 100px;
+  overflow-y: auto;
+  white-space: pre-line;
+  line-height: 1.4;
+}
+
+.popup-content strong {
+  font-weight: 600;
+}
+
+.popup-content em {
+  font-style: italic;
+  color: #999;
+}
+
+.popup-footer {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #ddd;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.popup-actions.second-row {
+  margin-bottom: 0;
+}
+
+.remind-later-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+#remind-later-time {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 0.9rem;
+}
+
+.btn-dismiss {
+  flex: 1;
+  background-color: #888;
+  color: white;
+}
+
+.btn-dismiss:hover {
+  background-color: #777;
+}
+
+.btn-complete-popup {
+  flex: 1;
+  background-color: #4caf50;
+  color: white;
+}
+
+.btn-complete-popup:hover {
+  background-color: #388e3c;
+}
+
+.btn-remind-later {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.btn-remind-later:hover {
+  background-color: #1976d2;
+}
+
+.notification.success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-color: #a5d6a7;
+}
+
+#dismiss-popup {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+#dismiss-popup:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Action buttons in table */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-action:hover {
+  transform: scale(1.1);
+}
+
+.btn-complete {
+  background-color: #4caf50;
+}
+
+.btn-complete:hover {
+  background-color: #388e3c;
+}
+
+.btn-reschedule {
+  background-color: #2196f3;
+}
+
+.btn-reschedule:hover {
+  background-color: #1976d2;
+}
+
+.btn-reactivate {
+  background-color: #ff9800;
+}
+
+.btn-reactivate:hover {
+  background-color: #f57c00;
+}
+
+/* Filter controls */
+.filter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-options select {
+  padding: 6px 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+/* Pagination controls */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.pagination-controls ul {
+  display: flex;
+  list-style: none;
+  gap: 5px;
+  padding: 0;
+  margin: 0;
+}
+
+.pagination-controls li a {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--text);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  transition: background-color 0.2s;
+}
+
+.pagination-controls li a:hover {
+  background-color: #f0f0f0;
+}
+
+.pagination-controls li a.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Dark mode support for popup */
+.dark-mode .popup-header {
+  background-color: var(--primary-dark);
+}
+
+.dark-mode .popup-content {
+  background-color: #333;
+}
+
+.dark-mode .popup-notes {
+  background-color: #2a2a2a;
+  color: #ddd;
+}
+
+.dark-mode .popup-footer {
+  background-color: #2a2a2a;
+  border-color: #444;
+}
+
+/* Dark Mode Toggle */
+.dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  gap: 8px;
+}
+
+.dark-mode-toggle .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.dark-mode-toggle .toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.dark-mode-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.dark-mode-toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.dark-mode-toggle input:checked + .slider {
+  background-color: #ffa500;
+}
+
+.dark-mode-toggle input:focus + .slider {
+  box-shadow: 0 0 1px #ffa500;
+}
+
+.dark-mode-toggle input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.dark-mode-toggle .toggle-label {
+  color: #fff;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Dark Mode Support */
+.dark-mode {
+  --background: #222;
+  --surface: #333;
+  --text: #eee;
+  --border: #555;
+  --input-bg: #444;
+  --input-border: #666;
+  --input-focus: #ffa500;
+  --row-alt: #3a3a3a;
+}
+
+.dark-mode body {
+  background-color: var(--background);
+  color: var(--text);
+}
+
+.dark-mode .form-group {
+  background-color: #2a2a2a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .input-field {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text);
+}
+
+.dark-mode .toggle-text {
+  color: #aaa;
+}
+
+.dark-mode .slider {
+  background-color: #666;
+}
+
+.dark-mode .notification {
+  background-color: #1e3a45;
+  color: #8ed1e1;
+  border-color: #2c5a6a;
+}
+
+.dark-mode .reminders-table {
+  background-color: var(--surface);
+}
+
+.dark-mode th {
+  background-color: #e69500;
+}
+
+.dark-mode td {
+  border-color: var(--border);
+}
+
+.dark-mode .reminder-type.annual {
+  background-color: #1b5e20;
+  color: #a5d6a7;
+  border-color: #2e7d32;
+}
+
+.dark-mode .reminder-type.custom {
+  background-color: #0d47a1;
+  color: #90caf9;
+  border-color: #1565c0;
+}
+
+.dark-mode .due-time {
+  color: #aaa;
+}
+
+.dark-mode .notes-content {
+  background-color: #2a2a2a;
+  color: #ddd;
+}
+
+.dark-mode .no-notes,
+.dark-mode .no-client {
+  color: #888;
+}
+
+.dark-mode .no-reminders {
+  color: #aaa;
+}
+
+.dark-mode #reminder-popup {
+  background-color: #333;
+  color: #eee;
+  border-color: #ffa500;
+}
+
+.dark-mode #reminder-popup p {
+  color: #eee;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-field {
+    width: 100%;
+  }
+  
+  .filter {
+    flex-direction: column;
+  }
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}

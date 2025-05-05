@@ -81,5 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <footer>
     <p>&copy; <?php echo date("Y"); ?> Your Company. All rights reserved.</p>
   </footer>
+  <script src="alerts.js"></script>
 </body>
 </html>

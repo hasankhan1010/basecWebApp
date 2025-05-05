@@ -1,129 +1,149 @@
-* {
+/* Reset & Box Sizing */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* Base Styles */
+html,
 body {
+  height: 100%;
+  width: 100%;
   font-family: Arial, sans-serif;
   background-color: #f0ead6;
   color: #333;
-  line-height: 1.6;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
+/* Navbar */
 .navbar {
   background-color: #ffa500;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
+  padding: 0.75rem 1.5rem;
+  flex-shrink: 0;
 }
 .navbar .nav-left a,
 .navbar .nav-right a {
   color: #fff;
   text-decoration: none;
-  padding: 8px 12px;
-  margin-right: 10px;
+  padding: 0.5rem 0.75rem;
+  margin-right: 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  font-size: 0.95rem;
 }
 .navbar .nav-left a:hover,
-.navbar .nav-right a:hover {
-  background-color: #e69500;
-  border-radius: 4px;
-}
+.navbar .nav-right a:hover,
 .navbar .nav-left a.active {
   background-color: #e69500;
-  border-radius: 4px;
 }
 
+/* Main Container */
 .container {
+  flex: 1;
   max-width: 1000px;
-  margin: 20px auto;
-  padding: 0 15px;
+  width: 100%;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
 }
 
-h1,
-h2 {
+/* Page Title */
+.container h1 {
   text-align: center;
   color: #ffa500;
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
 }
 
-.logged-in-user {
-  background-color: #fff;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+/* Route Controls */
+.route-controls {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
 }
-
-.search-refresh {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-.search-form input[type="text"] {
-  padding: 8px;
-  width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-.search-form button,
-.search-refresh button {
-  padding: 8px 16px;
-  background-color: #ffa500;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-.search-form button:hover,
-.search-refresh button:hover {
-  background-color: #e69500;
-}
-
-.notifications-list table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 20px;
-}
-.notifications-list th,
-.notifications-list td {
-  border: 1px solid #ccc;
-  padding: 12px 10px;
-  text-align: left;
-  vertical-align: middle;
-  word-wrap: break-word;
-  white-space: normal;
-}
-.notifications-list th {
-  background-color: #ffa500;
-  color: #fff;
-}
-
-.action-btn {
+.route-controls a {
   display: inline-block;
-  padding: 6px 12px;
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
   background-color: #ffa500;
   color: #fff;
   text-decoration: none;
   border-radius: 4px;
-  transition: background-color 0.3s;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
 }
-.action-btn:hover {
+.route-controls a:hover {
   background-color: #e69500;
 }
 
-.read-checkbox {
-  transform: scale(1.2);
+/* Route Container */
+#route-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
 }
 
+/* Map Panel */
+#map {
+  flex: 2;
+  width: 100%;
+  height: 400px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Directions Panel */
+#directions-panel {
+  flex: 1;
+  width: 100%;
+  height: 400px;
+  background-color: #fff;
+  padding: 1rem;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+#directions-panel p {
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+#directions-panel ol {
+  margin: 1rem 0;
+  padding-left: 1.25rem;
+}
+#directions-panel li {
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* Footer */
 footer {
   background-color: #f5f5f5;
   text-align: center;
-  padding: 15px;
+  padding: 1rem;
   border-top: 1px solid #ddd;
-  margin-top: 20px;
+  margin-top: auto;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* Responsive: stack panels on narrow screens */
+@media (max-width: 768px) {
+  #route-container {
+    flex-direction: column;
+  }
+  #map,
+  #directions-panel {
+    height: 300px;
+  }
 }

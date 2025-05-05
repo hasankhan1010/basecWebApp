@@ -86,6 +86,78 @@ header h1 {
   background-color: #e69500;
 }
 
+/* Filter Buttons */
+.filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-btn.active {
+  background-color: #ffa500;
+  color: white;
+  border-color: #e69500;
+}
+
+.clear-filters-btn {
+  padding: 8px 16px;
+  background-color: #f8f8f8;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-filters-btn:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+/* Dark mode support for filters */
+.dark-mode .filter-btn {
+  background-color: #444;
+  color: #ddd;
+  border-color: #555;
+}
+
+.dark-mode .filter-btn:hover {
+  background-color: #555;
+}
+
+.dark-mode .filter-btn.active {
+  background-color: #ffa500;
+  color: white;
+  border-color: #e69500;
+}
+
+.dark-mode .clear-filters-btn {
+  background-color: #444;
+  color: #ccc;
+  border-color: #555;
+}
+
+.dark-mode .clear-filters-btn:hover {
+  background-color: #555;
+  color: #eee;
+}
+
 /* CLIENTS LIST TABLE */
 .clients-list table {
   width: 100%;
@@ -121,4 +193,62 @@ header h1 {
 
 .select-btn:hover {
   background-color: #e69500;
+}
+
+/* Payment Status Indicators */
+.payment-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  font-weight: bold;
+}
+
+.payment-status.paid {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.payment-status.unpaid {
+  background-color: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+.payment-status.no-jobs {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+/* Dark mode support for payment status */
+.dark-mode .payment-status.paid {
+  background-color: #1b5e20;
+  color: #a5d6a7;
+  border-color: #388e3c;
+}
+
+.dark-mode .payment-status.unpaid {
+  background-color: #b71c1c;
+  color: #ef9a9a;
+  border-color: #d32f2f;
+}
+
+.dark-mode .payment-status.no-jobs {
+  background-color: #0d47a1;
+  color: #90caf9;
+  border-color: #1976d2;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f5f5f5;
+  text-align: center;
+  padding: 15px;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
 }

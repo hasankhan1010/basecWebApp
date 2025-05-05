@@ -93,31 +93,106 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['importClients'])) {
         $handle = fopen($csvFile, 'r');
         if ($handle !== FALSE) {
             // SKIPPING THE HEADER ROW 
-            fgetcsv($handle, 1000, ",");
+            $headers = fgetcsv($handle);
             $importCount = 0;
-            while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                // CSV COLUMNS IN ORDER:::::::::::::::::::::::::::
-                $firstName = $data[0] ?? '';
-                $lastName  = $data[1] ?? '';
-                $address1  = $data[2] ?? '';
-                $address2  = $data[3] ?? '';
-                $phone     = $data[4] ?? '';
-                $email     = $data[5] ?? '';
-                $notes     = $data[6] ?? '';
-                
-                $stmt = $conn->prepare("INSERT INTO Clients (clientFirstName, clientLastName, clientAddress1, clientAddress2, clientPhone, clientEmail, clientNotes) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssssss", $firstName, $lastName, $address1, $address2, $phone, $email, $notes);
-                $stmt->execute();
-                $stmt->close();
-                $importCount++;
+            $errorCount = 0;
+            $errors = [];
+            
+            // Display the detected headers for debugging
+            $headerDebug = "Detected headers: " . implode(", ", $headers);
+            
+            while (($data = fgetcsv($handle)) !== FALSE) {
+                // Check if we have enough data in the row
+                if (count($data) >= 6) {
+                    try {
+                        // Map data based on header positions or use default positions
+                        $clientFirstName = trim($data[0]);
+                        $clientLastName = trim($data[1]);
+                        $clientAddress1 = trim($data[2]);
+                        $clientAddress2 = trim($data[3]);
+                        $clientPhone = trim($data[4]);
+                        $clientEmail = trim($data[5]);
+                        $clientNotes = isset($data[6]) ? trim($data[6]) : '';
+                        
+                        // Validate essential data
+                        if (empty($clientFirstName) || empty($clientLastName)) {
+                            throw new Exception("Missing required name fields");
+                        }
+                        
+                        // Check if client already exists to avoid duplicates
+                        $checkStmt = $conn->prepare("SELECT clientID FROM Clients WHERE clientFirstName = ? AND clientLastName = ? AND clientEmail = ?");
+                        $checkStmt->bind_param("sss", $clientFirstName, $clientLastName, $clientEmail);
+                        $checkStmt->execute();
+                        $checkResult = $checkStmt->get_result();
+                        
+                        if ($checkResult->num_rows > 0) {
+                            // Client already exists, you could update instead if needed
+                            $checkStmt->close();
+                            continue;
+                        }
+                        $checkStmt->close();
+                        
+                        // Insert the new client
+                        $stmt = $conn->prepare("INSERT INTO Clients (clientFirstName, clientLastName, clientAddress1, clientAddress2, clientPhone, clientEmail, clientNotes) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->bind_param("sssssss", $clientFirstName, $clientLastName, $clientAddress1, $clientAddress2, $clientPhone, $clientEmail, $clientNotes);
+                        
+                        if ($stmt->execute()) {
+                            $importCount++;
+                        } else {
+                            throw new Exception("Database error: " . $stmt->error);
+                        }
+                        $stmt->close();
+                    } catch (Exception $e) {
+                        $errorCount++;
+                        $errors[] = "Row error: " . $e->getMessage();
+                        // Limit the number of errors we store to avoid overwhelming the user
+                        if (count($errors) > 5) {
+                            $errors[] = "Additional errors not shown...";
+                            break;
+                        }
+                    }
+                } else {
+                    $errorCount++;
+                    $errors[] = "Row has insufficient data: " . implode(", ", $data);
+                }
             }
             fclose($handle);
-            $importMessage = "$importCount clients imported successfully.";
+            
+            if ($importCount > 0) {
+                $importMessage = "<span class='success-message'>$importCount clients imported successfully.</span>";
+                if ($errorCount > 0) {
+                    $importMessage .= "<br><span class='error-message'>$errorCount rows had errors.</span>";
+                    $importMessage .= "<div class='error-details'><ul>";
+                    foreach ($errors as $error) {
+                        $importMessage .= "<li>" . htmlspecialchars($error) . "</li>";
+                    }
+                    $importMessage .= "</ul></div>";
+                }
+            } else {
+                $importMessage = "<span class='error-message'>No clients were imported. Please check your CSV file format.</span>";
+                $importMessage .= "<br>" . htmlspecialchars($headerDebug);
+                $importMessage .= "<div class='error-details'><ul>";
+                foreach ($errors as $error) {
+                    $importMessage .= "<li>" . htmlspecialchars($error) . "</li>";
+                }
+                $importMessage .= "</ul></div>";
+            }
         } else {
-            $importMessage = "Error reading CSV file.";
+            $importMessage = "<span class='error-message'>Error reading CSV file. Please make sure it's a valid CSV format.</span>";
         }
     } else {
-        $importMessage = "Error uploading CSV file.";
+        $errorCode = $_FILES['csvFile']['error'];
+        $errorMessages = [
+            UPLOAD_ERR_INI_SIZE => "The uploaded file exceeds the upload_max_filesize directive in php.ini",
+            UPLOAD_ERR_FORM_SIZE => "The uploaded file exceeds the MAX_FILE_SIZE directive in the HTML form",
+            UPLOAD_ERR_PARTIAL => "The uploaded file was only partially uploaded",
+            UPLOAD_ERR_NO_FILE => "No file was uploaded",
+            UPLOAD_ERR_NO_TMP_DIR => "Missing a temporary folder",
+            UPLOAD_ERR_CANT_WRITE => "Failed to write file to disk",
+            UPLOAD_ERR_EXTENSION => "A PHP extension stopped the file upload"
+        ];
+        $errorMessage = isset($errorMessages[$errorCode]) ? $errorMessages[$errorCode] : "Unknown error";
+        $importMessage = "<span class='error-message'>Error uploading CSV file: $errorMessage</span>";
     }
 }
 
@@ -155,20 +230,6 @@ if ($result) {
         $activeUsers[] = $row;
     }
 }
-
-// RETRIEVE THE SYSTEM LOG FROM THE ADMINLOG TABLE 
-
-$adminLog = [];
-$tableCheck = $conn->query("SHOW TABLES LIKE 'AdminLog'");
-if ($tableCheck && $tableCheck->num_rows > 0) {
-    $logQuery = "SELECT * FROM AdminLog ORDER BY logDateTime DESC";
-    $logResult = mysqli_query($conn, $logQuery);
-    if ($logResult) {
-        while ($row = mysqli_fetch_assoc($logResult)) {
-            $adminLog[] = $row;
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -176,6 +237,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
     <meta charset="UTF-8">
     <title>Admin Control Panel</title>
     <link rel="stylesheet" href="adminControl.css">
+    <link rel="stylesheet" href="darkmode.css">
     <script src="js/jquery.min.js"></script>
     <script>
     $(document).ready(function(){
@@ -192,9 +254,10 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             <a href="surveyDiary.php">Survey Diary</a>
             <a href="adminControl.php" class="active">Admin Control</a>
             <a href="feedback.php">Feedback</a>
-            <a href="notifications.php">Notifications</a>
+            <a href="notifications.php">Map Routes</a>
             <a href="sustainabilityMetrics.php">Sustainability Metrics</a>
             <a href="payments.php">Payments</a>
+            <a href="reminders.php">Reminders</a>
         </div>
         <div class="nav-right">
             <a href="logout.php">Logout</a>
@@ -314,36 +377,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
             </div>
         </section>
         
-        <!-- SYSTEM LOG ::::: -->
-        <section class="system-log">
-            <h2>System Log</h2>
-            <?php if (!empty($adminLog)): ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Log ID</th>
-                        <th>User ID</th>
-                        <th>Action Type</th>
-                        <th>Action Details</th>
-                        <th>Date / Time</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($adminLog as $log): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($log['logID']); ?></td>
-                        <td><?php echo htmlspecialchars($log['userID']); ?></td>
-                        <td><?php echo htmlspecialchars($log['actionType']); ?></td>
-                        <td><?php echo htmlspecialchars($log['actionDetails']); ?></td>
-                        <td><?php echo htmlspecialchars($log['logDateTime']); ?></td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-            <?php else: ?>
-            <p>No log entries found.</p>
-            <?php endif; ?>
-        </section>
+
     </div>
     
     <footer>
@@ -360,5 +394,7 @@ if ($tableCheck && $tableCheck->num_rows > 0) {
         }
     });
     </script>
+    <script src="alerts.js"></script>
+    <script src="darkmode.js"></script>
 </body>
 </html>

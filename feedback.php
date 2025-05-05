@@ -12,17 +12,29 @@ if (isset($_GET['search'])) {
     $search = mysqli_real_escape_string($conn, trim($_GET['search']));
 }
 
-// ONLY QUERY THE RECENT JOBS WITH 'COMPLETE' OR 'COMPLETED'
-// LEFT JOIN THE CLIENTS TO GET CLIENT DETAILS - NEEDS TO BE DONE VIA FEEDBACK TABLE ON SCHEDULEID = FEEDBACKID
+// Get filter parameters
+$feedbackFilter = isset($_GET['feedbackFilter']) ? $_GET['feedbackFilter'] : 'all';
+
+// QUERY ALL JOBS FROM SCHEDULE DIARY WITH FILTERING OPTIONS
+// LEFT JOIN THE CLIENTS TO GET CLIENT DETAILS AND FEEDBACK DATA
 
 $query = "SELECT sd.scheduleID, sd.scheduleJobType, sd.engineerID, sd.scheduleDate, 
                  sd.scheduleStartTime, sd.scheduleEndTime, sd.scheduleDetails, sd.scheduleStatus,
-                 c.clientFirstName, c.clientLastName, c.clientEmail,
+                 c.clientID, c.clientFirstName, c.clientLastName, c.clientEmail,
                  f.feedbackRating, f.feedbackComments, f.feedbackSentDateTime, f.feedbackRecievedDateTime
           FROM ScheduleDiary sd
           JOIN Clients c ON sd.clientID = c.clientID
-          LEFT JOIN Feedback f ON sd.scheduleID = f.feedbackID
-          WHERE sd.scheduleStatus IN ('complete', 'completed')";
+          LEFT JOIN Feedback f ON sd.scheduleID = f.feedbackID";
+
+// Start WHERE clause for filters
+$query .= " WHERE 1=1"; // Always true condition for easier filter chaining
+
+// Apply feedback filter if selected
+if ($feedbackFilter === 'received') {
+    $query .= " AND f.feedbackRating IS NOT NULL";
+} elseif ($feedbackFilter === 'pending') {
+    $query .= " AND f.feedbackRating IS NULL";
+}
 
 if ($search !== "") {
     // YOU CAN SEARCH BY CLIENT NAME, FEEDBACK ETC:::::::::
@@ -47,6 +59,7 @@ if ($result) {
   <meta charset="UTF-8">
   <title>Feedback</title>
   <link rel="stylesheet" href="feedback.css">
+  <link rel="stylesheet" href="darkmode.css">
 </head>
 <body>
  
@@ -58,9 +71,10 @@ if ($result) {
       <a href="surveyDiary.php">Survey Diary</a>
       <a href="adminControl.php">Admin Control</a>
       <a href="feedback.php" class="active">Feedback</a>
-      <a href="notifications.php">Notifications</a>
+      <a href="notifications.php">Map Routes</a>
       <a href="sustainabilityMetrics.php">Sustainability Metrics</a>
       <a href="payments.php">Payments</a>
+      <a href="reminders.php">Reminders</a>
     </div>
     <div class="nav-right">
       <a href="logout.php">Logout</a>
@@ -74,8 +88,23 @@ if ($result) {
       <form method="get" action="feedback.php" class="search-form">
         <input type="text" name="search" placeholder="Search feedback..." value="<?php echo htmlspecialchars($search); ?>">
         <button type="submit">Search</button>
+        <?php if ($feedbackFilter !== 'all'): ?>
+          <input type="hidden" name="feedbackFilter" value="<?php echo $feedbackFilter; ?>">
+        <?php endif; ?>
       </form>
-      <button onclick="location.reload()">Refresh</button>
+      
+      <div class="filter-controls">
+        <div class="filter-group">
+          <span class="filter-label">Feedback Status:</span>
+          <a href="?feedbackFilter=all<?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="filter-btn <?php echo $feedbackFilter === 'all' ? 'active' : ''; ?>">All</a>
+          <a href="?feedbackFilter=received<?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="filter-btn <?php echo $feedbackFilter === 'received' ? 'active' : ''; ?>">Received</a>
+          <a href="?feedbackFilter=pending<?php echo $search ? '&search='.urlencode($search) : ''; ?>" class="filter-btn <?php echo $feedbackFilter === 'pending' ? 'active' : ''; ?>">Pending</a>
+        </div>
+        
+        <a href="feedback.php" class="clear-filters-btn">Clear Filters</a>
+      </div>
+      
+      <button onclick="location.reload()" class="refresh-btn">Refresh</button>
     </div>
     
     <!-- TABLE FOR JOB ENTRIES  -->
@@ -84,6 +113,7 @@ if ($result) {
       <table>
         <thead>
           <tr>
+            <th>Client ID</th>
             <th>Client Name</th>
             <th>Job Type</th>
             <th>Engineer ID</th>
@@ -113,7 +143,9 @@ if ($result) {
             $action = "";
             if (empty($entry['feedbackRating'])) {
                 $subject = rawurlencode("BASecurity Feedback Survey");
-                $body = rawurlencode("Dear " . $clientName . ",\n\nPlease provide your feedback for your recent job (" . $jobType . ") by visiting the link below:\n\nhttp://basecuritywebapp-g6g4hjcaeccva7gz.uksouth-01.azurewebsites.net/feedbackSurvey.php?jobID=" . $entry['scheduleID'] . "\n\nThank you!");
+                // Use localhost URL instead of Azure for local testing
+                $localUrl = "http://localhost/basec%20crm/feedbackSurvey.php?jobID=" . $entry['scheduleID'];
+                $body = rawurlencode("Dear " . $clientName . ",\n\nPlease provide your feedback for your recent job (" . $jobType . ") by visiting the link below:\n\n" . $localUrl . "\n\nThank you!");
                 $mailto = "mailto:" . htmlspecialchars($entry['clientEmail']) . "?subject={$subject}&body={$body}";
                 $action = "<a href='{$mailto}' class='email-link'>Send Survey</a>";
             } else {
@@ -121,6 +153,7 @@ if ($result) {
             }
           ?>
           <tr>
+            <td><?php echo htmlspecialchars($entry['clientID']); ?></td>
             <td><?php echo $clientName; ?></td>
             <td><?php echo $jobType; ?></td>
             <td><?php echo $engineerID; ?></td>
@@ -142,5 +175,7 @@ if ($result) {
   <footer>
     <p>&copy; <?php echo date("Y"); ?> BA Security. All rights reserved.</p>
   </footer>
+  <script src="alerts.js"></script>
+  <script src="darkmode.js"></script>
 </body>
 </html>

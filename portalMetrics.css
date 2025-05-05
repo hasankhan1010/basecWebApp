@@ -1,0 +1,78 @@
+/* portalMetrics.css — Sleek, professional metric cards */
+
+.portal-metrics {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid transparent;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Color-code cards by type */
+.metric-card:nth-child(1) {
+  border-left-color: #ff6b6b; /* Power - red */
+}
+
+.metric-card:nth-child(2) {
+  border-left-color: #51cf66; /* Carbon - green */
+}
+
+.metric-card:nth-child(3) {
+  border-left-color: #339af0; /* Water - blue */
+}
+
+.metric-card:nth-child(4) {
+  border-left-color: #fcc419; /* Performance - yellow */
+}
+
+.metric-card:nth-child(5) {
+  border-left-color: #845ef7; /* Sustainability - purple */
+}
+
+.metric-label {
+  font-size: 0.9em;
+  color: #495057;
+  margin-bottom: 8px;
+  letter-spacing: 0.05em;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #ff8c00;
+}
+
+/* Dark mode */
+body.dark-mode .metric-card {
+  background: #2e2e2e;
+}
+body.dark-mode .metric-label {
+  color: #ccc;
+}
+body.dark-mode .metric-value {
+  color: #ffb347;
+}

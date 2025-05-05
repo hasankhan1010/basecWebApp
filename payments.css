@@ -110,6 +110,61 @@ h1 {
   resize: vertical;
 }
 
+/* Payment Status Styling */
+.payment-status-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-status-select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  width: calc(100% - 20px);
+  transition: all 0.3s ease;
+}
+
+.payment-status-select.status-paid {
+  border-color: #4CAF50;
+  background-color: #e8f5e9;
+}
+
+.payment-status-select.status-unpaid {
+  border-color: #f44336;
+  background-color: #ffebee;
+}
+
+.payment-status-indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.payment-status-indicator.paid {
+  background-color: #4CAF50;
+  box-shadow: 0 0 5px #4CAF50;
+}
+
+.payment-status-indicator.unpaid {
+  background-color: #f44336;
+  box-shadow: 0 0 5px #f44336;
+}
+
+/* Dark mode support */
+.dark-mode .payment-status-select.status-paid {
+  background-color: #1b5e20;
+  color: #e8f5e9;
+  border-color: #2e7d32;
+}
+
+.dark-mode .payment-status-select.status-unpaid {
+  background-color: #b71c1c;
+  color: #ffebee;
+  border-color: #c62828;
+}
+
 .form-actions {
   text-align: center;
   margin-top: 20px;
@@ -128,9 +183,64 @@ h1 {
 }
 
 footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+
   background-color: #f5f5f5;
   text-align: center;
   padding: 15px;
   border-top: 1px solid #ddd;
-  margin-top: 20px;
+  z-index: 1000;
+}
+
+/* Single payment form styling */
+.single-payment-form {
+  display: flex;
+  flex-direction: column;
+}
+
+.save-row-btn {
+  padding: 6px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 5px;
+}
+
+.save-row-btn:hover {
+  background-color: #45a049;
+}
+
+/* Alert message styling */
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+/* Dark mode support for alerts and buttons */
+.dark-mode .alert-success {
+  color: #c3e6cb;
+  background-color: #155724;
+  border-color: #2d8d3a;
+}
+
+.dark-mode .save-row-btn {
+  background-color: #2d8d3a;
+}
+
+.dark-mode .save-row-btn:hover {
+  background-color: #3ca04a;
 }

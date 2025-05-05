@@ -172,3 +172,34 @@ footer {
   border-top: 1px solid #ddd;
   margin-top: 20px;
 }
+
+/* Message styling for CSV import */
+.success-message {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.error-message {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.error-details {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #fff3e0;
+  border-radius: 4px;
+  font-size: 0.9em;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-details ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.dark-mode .error-details {
+  background-color: #3e2723;
+  color: #ffccbc;
+}

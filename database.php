@@ -1,13 +1,10 @@
 
 <?php
 
-
-
-$servername = "baseccrmdb.mysql.database.azure.com";
-$username = "basecAdmin1"; 
-$password = "BasecurityAdmin@0987"; 
-$dbname = "baseccrmdb";
-
+$servername = "localhost";
+$username = "root";
+$password = ""; // default password for XAMPP is empty
+$dbname = "basecuritydb";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -18,4 +15,5 @@ if ($conn->connect_error) {
     // SET THE $conn TO NULL!!! SO OTHERS KNOW THAT ITS INVALID 
     $conn = null;
 }
+
 ?>

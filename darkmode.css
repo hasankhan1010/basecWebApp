@@ -1,0 +1,151 @@
+/* darkmode.css - Unified dark mode for all pages, single toggle above footer */
+
+/* Toggle switch wrapper above footer */
+.theme-switch-wrapper {
+  display: flex;
+  justify-content: center;
+  padding: 1rem;
+  background-color: #f0ead6;
+  border-top: 1px solid #ccc;
+}
+
+/* Toggle slide styling */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-switch .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+.toggle-switch .slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+.toggle-switch input:checked + .slider {
+  background-color: #ffa500;
+}
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Dark mode overrides */
+body.dark-mode {
+  background-color: #2e2e2e;
+  color: #ffffff;
+}
+
+/* Navbar styles */
+body.dark-mode .navbar {
+  background-color: #3a3a3a;
+}
+body.dark-mode .navbar a,
+body.dark-mode .navbar a:hover,
+body.dark-mode .navbar a.active {
+  color: #ffffff;
+  background-color: transparent;
+}
+body.dark-mode .navbar a:hover,
+body.dark-mode .navbar a.active {
+  background-color: #4a4a4a;
+}
+
+/* Portal specific styles */
+body.dark-mode header {
+  background-color: #3a3a3a;
+  border-bottom: 1px solid #555;
+}
+
+body.dark-mode .portal-nav button {
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+body.dark-mode .portal-nav button:hover {
+  background-color: #555;
+}
+
+body.dark-mode .theme-switch-wrapper {
+  background-color: #333;
+  border-top: 1px solid #555;
+}
+
+body.dark-mode .toggle-label {
+  color: #fff;
+}
+
+body.dark-mode footer {
+  background-color: #333;
+  border-top: 1px solid #555;
+}
+body.dark-mode .container,
+body.dark-mode section,
+body.dark-mode .card,
+body.dark-mode .table-responsive {
+  background-color: #3a3a3a;
+  border-color: #555555;
+}
+body.dark-mode footer {
+  background-color: #3a3a3a;
+}
+body.dark-mode footer p {
+  color: #ffffff;
+}
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+body.dark-mode .input-field {
+  background-color: #4a4a4a;
+  color: #ffffff;
+  border: 1px solid #666666;
+}
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: #ffa500;
+  outline: none;
+}
+body.dark-mode table {
+  background-color: #3a3a3a;
+}
+body.dark-mode thead {
+  background-color: #4a4a4a;
+}
+body.dark-mode th,
+body.dark-mode td {
+  border: 1px solid #555555;
+  color: #ffffff;
+}
+body.dark-mode tbody tr:nth-child(even) {
+  background-color: #4a4a4a;
+}
+body.dark-mode #reminder-popup {
+  background-color: #3a3a3a;
+  border: 2px solid #555555;
+}
+body.dark-mode #reminder-popup p,
+body.dark-mode #reminder-popup .button {
+  color: #ffffff;
+}

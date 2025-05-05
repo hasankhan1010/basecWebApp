@@ -87,6 +87,37 @@ legend {
   min-width: 0; /* CAN SHRINK IF NEEDED - SAVE THISSS */
 }
 
+.form-row td input[type="text"],
+td select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+td input[type="text"]:focus,
+td select:focus {
+  border-color: #ffa500;
+  outline: none;
+  box-shadow: 0 0 3px rgba(255, 165, 0, 0.3);
+}
+
+.table-input-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.table-input-wrapper input,
+.table-input-wrapper select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
 textarea {
   resize: vertical;
 }
@@ -94,6 +125,9 @@ textarea {
 /* Job History Table */
 .table-responsive {
   overflow-x: auto; /* ONLY IF TOO WIDE - HORIZONTAL SCROLL */
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
 }
 
 table {
@@ -101,21 +135,35 @@ table {
   table-layout: fixed;
   border-collapse: collapse;
   margin-top: 10px;
+  border: 1px solid #ddd;
 }
 
 th,
 td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  vertical-align: top;
+  border: 1px solid #ddd;
+  padding: 12px 10px;
+  vertical-align: middle;
   word-wrap: break-word;
   white-space: pre-wrap;
   overflow-wrap: break-word;
+  text-align: center;
 }
 
 th {
   background-color: #ffa500;
   color: #fff;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  letter-spacing: 0.5px;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tr:hover {
+  background-color: #f1f1f1;
 }
 
 .form-actions {
@@ -135,6 +183,103 @@ th {
 
 .form-actions button:hover {
   background-color: #e69500;
+}
+
+/* Filter Controls */
+.filter-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-label {
+  font-weight: bold;
+  color: #555;
+}
+
+.filter-btn {
+  padding: 6px 12px;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.filter-btn.active {
+  background-color: #ffa500;
+  color: white;
+  border-color: #e69500;
+}
+
+.clear-filter-btn {
+  padding: 6px 12px;
+  background-color: #f8f8f8;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.clear-filter-btn:hover {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+/* Dark mode support for filters */
+.dark-mode .filter-controls {
+  background-color: #333;
+  border-color: #444;
+}
+
+.dark-mode .filter-label {
+  color: #ccc;
+}
+
+.dark-mode .filter-btn {
+  background-color: #444;
+  color: #ddd;
+  border-color: #555;
+}
+
+.dark-mode .filter-btn:hover {
+  background-color: #555;
+}
+
+.dark-mode .filter-btn.active {
+  background-color: #ffa500;
+  color: white;
+  border-color: #e69500;
+}
+
+.dark-mode .clear-filter-btn {
+  background-color: #444;
+  color: #ccc;
+  border-color: #555;
+}
+
+.dark-mode .clear-filter-btn:hover {
+  background-color: #555;
+  color: #eee;
 }
 
 .client-files {

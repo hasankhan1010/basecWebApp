@@ -74,6 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <title><?php echo ($surveyID ? "Edit" : "Add"); ?> Survey Diary Entry</title>
     <link rel="stylesheet" href="surveyDiaryAdd.css">
+    <link rel="stylesheet" href="darkmode.css">
 </head>
 <body>
     <!-- NAV BAR -->
@@ -85,9 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <a href="surveyDiary.php" class="active">Survey Diary</a>
             <a href="adminControl.php">Admin Control</a>
             <a href="feedback.php">Feedback</a>
-            <a href="notifications.php">Notifications</a>
+            <a href="notifications.php">Map Routes</a>
             <a href="sustainabilityMetrics.php">Sustainability Metrics</a>
             <a href="payments.php">Payments</a>
+            <a href="reminders.php">Reminders</a>
         </div>
         <div class="nav-right">
             <a href="logout.php">Logout</a>
@@ -120,8 +122,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
     </div>
     
-    <footer>
-        <p>&copy; <?php echo date("Y"); ?> Your Company Name. All rights reserved.</p>
-    </footer>
+    <footer> 
+    <p>&copy; <?php echo date("Y"); ?> BA Security. All rights reserved.</p> 
+  </footer>
+    <script src="alerts.js"></script>
+    <script src="darkmode.js"></script>
 </body>
 </html>

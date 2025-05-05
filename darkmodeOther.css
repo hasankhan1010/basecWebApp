@@ -1,0 +1,118 @@
+/* darkmodeOther.css - Dark theme overrides & top-left slider under navbar */
+
+/* Wrapper under navbar */
+.theme-switch-wrapper-other {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0.5rem 1rem;
+  background-color: #f0ead6;
+  border-bottom: 1px solid #ccc;
+}
+
+/* Toggle switch structure */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Track */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* Knob */
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #fff;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+/* Checked states */
+.toggle-switch input:checked + .slider {
+  background-color: #ffa500;
+}
+.toggle-switch input:checked + .slider:before {
+  transform: translateX(26px);
+}
+.toggle-switch input:focus + .slider {
+  box-shadow: 0 0 1px #ffa500;
+}
+
+/* Dark mode overrides */
+body.dark-mode {
+  background-color: #2e2e2e;
+  color: #000;
+}
+body.dark-mode .navbar {
+  background-color: #cc8400;
+}
+body.dark-mode .navbar a {
+  color: #000;
+}
+body.dark-mode .navbar a:hover,
+body.dark-mode .navbar a.active {
+  background-color: #b36b00;
+}
+body.dark-mode .theme-switch-wrapper-other {
+  background-color: #3a3a3a;
+  border-color: #555;
+}
+body.dark-mode .container {
+  background-color: #3a3a3a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background-color: #4a4a4a;
+  color: #000;
+  border: 1px solid #666;
+}
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  border-color: #ffa500;
+  outline: none;
+}
+body.dark-mode table {
+  background-color: #3a3a3a;
+}
+body.dark-mode thead {
+  background-color: #cc8400;
+  color: #000;
+}
+body.dark-mode th,
+body.dark-mode td {
+  border-color: #555;
+  color: #000;
+}
+body.dark-mode tbody tr:nth-child(even) {
+  background-color: #4a4a4a;
+}
+body.dark-mode footer {
+  background-color: #cc8400;
+}
+body.dark-mode footer p {
+  color: #000;
+}

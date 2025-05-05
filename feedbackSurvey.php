@@ -44,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <title>Feedback Survey</title>
     <link rel="stylesheet" href="feedbackSurvey.css">
+    <link rel="stylesheet" href="darkmode.css">
     <script>
         function selectRating(value) {
             document.getElementById('ratingInput').value = value;
@@ -86,5 +87,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </form>
         <?php endif; ?>
     </div>
+    <script src="darkmode.js"></script>
 </body>
 </html>

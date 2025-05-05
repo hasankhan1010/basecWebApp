@@ -55,6 +55,8 @@ $stmt->close();
     <meta charset="UTF-8">
     <title>Survey Diary</title>
     <link rel="stylesheet" href="surveyDiary.css">
+    <link rel="stylesheet" href="darkmode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script>
       // MUST WAIT FOR DOM TO LOAD BEFORE ATTACHING EVENTS 
       document.addEventListener("DOMContentLoaded", function() {
@@ -70,10 +72,45 @@ $stmt->close();
                   var content = "";
                   if (data && data.length > 0) {
                       data.forEach(function(entry) {
-                          content += "<div class='entry'>";
-                          content += "<p><strong>Created By:</strong> " + entry.surveyCreatedByID + "</p>";
-                          content += "<p><strong>Notes:</strong> " + entry.surveyNotes + "</p>";
-                          content += "<p><strong>Status:</strong> " + entry.surveyStatus + "</p>";
+                          // Safely get values with fallbacks
+                          var createdBy = entry.surveyCreatedByID || 'Unknown';
+                          var notes = entry.surveyNotes || '';
+                          var status = entry.surveyStatus || 'Pending';
+                          var surveyId = entry.surveyID || '0';
+                          
+                          // Determine status class for visual indicator
+                          var statusClass = '';
+                          var statusLower = status.toLowerCase();
+                          if (statusLower.includes('complete')) {
+                              statusClass = 'status-complete';
+                          } else if (statusLower.includes('progress')) {
+                              statusClass = 'status-progress';
+                          } else if (statusLower.includes('cancel')) {
+                              statusClass = 'status-cancelled';
+                          } else if (statusLower.includes('pending')) {
+                              statusClass = 'status-pending';
+                          }
+                          
+                          content += "<div class='entry " + statusClass + "'>";
+                          content += "<div class='entry-header'>";
+                          content += "<h3><i class='fas fa-clipboard-list'></i> Survey Entry</h3>";
+                          content += "<span class='entry-status'>" + status + "</span>";
+                          content += "</div>";
+                          
+                          content += "<div class='entry-details'>";
+                          content += "<div class='detail-row'><span class='detail-label'>Created By:</span> <span class='detail-value'>" + createdBy + "</span></div>";
+                          
+                          if (notes && notes.trim() !== "") {
+                              content += "<div class='detail-section'><span class='detail-label'>Notes:</span>";
+                              content += "<div class='detail-text'>" + notes + "</div></div>";
+                          }
+                          content += "</div>";
+                          
+                          content += "<div class='entry-actions'>";
+                          content += "<a href='surveyDiaryAdd.php?surveyID=" + surveyId + "' class='edit-entry-btn'><i class='fa fa-edit'></i> Edit</a>";
+                          content += "<a href='deleteSurveyEntry.php?surveyID=" + surveyId + "' class='delete-entry-btn' onclick='return confirm(\"Are you sure you want to delete this entry?\");'><i class='fa fa-trash'></i> Delete</a>";
+                          content += "</div>";
+                          
                           content += "</div><hr>";
                       });
                   } else {
@@ -115,9 +152,10 @@ $stmt->close();
             <a href="surveyDiary.php" class="active">Survey Diary</a>
             <a href="adminControl.php">Admin Control</a>
             <a href="feedback.php">Feedback</a>
-            <a href="notifications.php">Notifications</a>
+            <a href="notifications.php">Map Routes</a>
             <a href="sustainabilityMetrics.php">Sustainability Metrics</a>
             <a href="payments.php">Payments</a>
+            <a href="reminders.php">Reminders</a>
         </div>
         <div class="nav-right">
             <a href="logout.php">Logout</a>
@@ -165,15 +203,34 @@ $stmt->close();
                             echo "<td class='timeslot' data-key='$key'>";
                             if (isset($surveys[$key])) {
                                 foreach ($surveys[$key] as $survey) {
-                                    // PRESENTATION WISE - TRUNCATE THE NOTES TO 50CHAARCTERS - TRY 100 THEN 50
-                                    $notes = htmlspecialchars($survey['surveyNotes']);
-                                    if (strlen($notes) > 50) {
-                                        $notes = substr($notes, 0, 50) . '...';
+                                    // Safely get values with error checking
+                                    $notes = isset($survey['surveyNotes']) ? $survey['surveyNotes'] : '';
+                                    $notes = htmlspecialchars($notes);
+                                    if (strlen($notes) > 40) {
+                                        $notes = substr($notes, 0, 40) . '...';
                                     }
-                                    echo "<div class='survey-entry'>";
-                                    echo "<strong>" . htmlspecialchars($survey['surveyCreatedByID']) . "</strong><br>";
-                                    echo $notes . "<br>";
-                                    echo "<em>" . htmlspecialchars($survey['surveyStatus']) . "</em>";
+                                    
+                                    // Safely get survey status
+                                    $surveyStatus = isset($survey['surveyStatus']) ? $survey['surveyStatus'] : 'Pending';
+                                    $createdBy = isset($survey['surveyCreatedByID']) ? $survey['surveyCreatedByID'] : 'Unknown';
+                                    
+                                    // Determine status class for visual indicator
+                                    $statusClass = '';
+                                    $status = strtolower($surveyStatus);
+                                    if (strpos($status, 'complete') !== false) {
+                                        $statusClass = 'status-complete';
+                                    } elseif (strpos($status, 'progress') !== false) {
+                                        $statusClass = 'status-progress';
+                                    } elseif (strpos($status, 'cancel') !== false) {
+                                        $statusClass = 'status-cancelled';
+                                    } elseif (strpos($status, 'pending') !== false) {
+                                        $statusClass = 'status-pending';
+                                    }
+                                    
+                                    echo "<div class='survey-entry $statusClass'>";
+                                    echo "<div class='entry-title'><i class='fas fa-clipboard-list'></i> <strong>" . htmlspecialchars($createdBy) . "</strong></div>";
+                                    echo "<div class='entry-details'>" . $notes . "</div>";
+                                    echo "<div class='entry-status'><span>" . htmlspecialchars($surveyStatus) . "</span></div>";
                                     echo "</div>";
                                 }
                             } else {
@@ -204,5 +261,7 @@ $stmt->close();
     <script>
       var surveyData = <?php echo json_encode($surveys); ?>;
     </script>
+        <script src="alerts.js"></script>
+        <script src="darkmode.js"></script>
 </body>
 </html>
