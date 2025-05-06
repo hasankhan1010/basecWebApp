@@ -10,17 +10,57 @@ include('database.php');
 if (isset($_GET['action']) && $_GET['action'] === 'deleteUser' && isset($_GET['role']) && isset($_GET['id'])) {
     $role = $_GET['role'];
     $id = intval($_GET['id']);
-    if ($role === 'engineer') {
-        $conn->query("DELETE FROM Engineer WHERE engineerID = $id");
-    } elseif ($role === 'admin') {
-        $conn->query("DELETE FROM Administrator WHERE adminID = $id");
-    } elseif ($role === 'manager') {
-        $conn->query("DELETE FROM Manager WHERE managerID = $id");
-    } elseif ($role === 'sales') {
-        $conn->query("DELETE FROM SalesTeam WHERE SalesID = $id");
+    $success = false;
+    
+    // Use prepared statements to prevent SQL injection
+    try {
+        if ($role === 'engineer') {
+            $stmt = $conn->prepare("DELETE FROM Engineer WHERE engineerID = ?");
+            $stmt->bind_param("i", $id);
+            $success = $stmt->execute();
+            $stmt->close();
+        } elseif ($role === 'admin') {
+            $stmt = $conn->prepare("DELETE FROM Administrator WHERE adminID = ?");
+            $stmt->bind_param("i", $id);
+            $success = $stmt->execute();
+            $stmt->close();
+        } elseif ($role === 'manager') {
+            $stmt = $conn->prepare("DELETE FROM Manager WHERE managerID = ?");
+            $stmt->bind_param("i", $id);
+            $success = $stmt->execute();
+            $stmt->close();
+        } elseif ($role === 'sales') {
+            $stmt = $conn->prepare("DELETE FROM SalesTeam WHERE SalesID = ?");
+            $stmt->bind_param("i", $id);
+            $success = $stmt->execute();
+            $stmt->close();
+        }
+        
+        // Try to log the event if possible, but don't fail if logging fails
+        try {
+            // Check if ActivityLog table exists
+            $tableCheckResult = $conn->query("SHOW TABLES LIKE 'ActivityLog'");
+            if ($tableCheckResult->num_rows > 0) {
+                $userRole = ucfirst($role);
+                $date = date('Y-m-d H:i:s');
+                $adminUser = $_SESSION['user']['username'] ?? 'Unknown';
+                $logStmt = $conn->prepare("INSERT INTO ActivityLog (activityType, activityDescription, activityDate, activityUser) VALUES (?, ?, ?, ?)");
+                $activityType = 'User Deletion';
+                $activityDescription = "$userRole with ID $id was deleted by $adminUser";
+                $logStmt->bind_param("ssss", $activityType, $activityDescription, $date, $adminUser);
+                $logStmt->execute();
+                $logStmt->close();
+            }
+        } catch (Exception $e) {
+            // Silently ignore logging errors
+        }
+    } catch (Exception $e) {
+        // Set an error message if deletion fails
+        $_SESSION['deleteError'] = "Error deleting user: " . $e->getMessage();
     }
-    // A LOG DELETION EVENT? - INCLUDED - ADD TO DOCUMENT
-    header("Location: adminControl.php");
+    
+    // Redirect back to admin control page
+    header("Location: adminControl.php" . ($success ? "?deleted=1" : "?error=1"));
     exit();
 }
 
@@ -196,10 +236,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['importClients'])) {
     }
 }
 
+// Set up messages for user deletion feedback
+$deleteMessage = "";
+if (isset($_GET['deleted']) && $_GET['deleted'] == 1) {
+    $deleteMessage = "<div class='message-container'><div class='success-message'>User has been successfully deleted.</div></div>";
+} else if (isset($_GET['error']) && $_GET['error'] == 1) {
+    $deleteMessage = "<div class='message-container'><div class='error-message'>Error deleting user. Please try again.</div></div>";
+}
+if (isset($_SESSION['deleteError'])) {
+    $deleteMessage = "<div class='message-container'><div class='error-message'>{$_SESSION['deleteError']}</div></div>";
+    unset($_SESSION['deleteError']);
+}
+
 // GETTING ALL ACTIVE USER INFO - FOR LOGBOOK VIEWING
 $activeUsers = [];
 // ACTIVE MANAGERS 
-$query = "SELECT managerID AS userID, managerUsername AS username, managerFirstName AS firstName, managerLastName AS lastName, 'Manager' AS role FROM Manager WHERE managerIsActive = 1";
+$query = "SELECT managerID AS userID, managerUsername AS username, managerFirstName AS firstName, managerLastName AS lastName, 'Manager' AS role FROM Manager";
 $result = mysqli_query($conn, $query);
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
@@ -207,7 +259,7 @@ if ($result) {
     }
 }
 // ACTIVE ENGINEERS
-$query = "SELECT engineerID AS userID, engineerUsername AS username, engineerFirstName AS firstName, engineerLastName AS lastName, 'Engineer' AS role FROM Engineer WHERE engineerIsActive = 1";
+$query = "SELECT engineerID AS userID, engineerUsername AS username, engineerFirstName AS firstName, engineerLastName AS lastName, 'Engineer' AS role FROM Engineer";
 $result = mysqli_query($conn, $query);
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
@@ -215,7 +267,7 @@ if ($result) {
     }
 }
 // ACTIVE ADMINISTRATORS 
-$query = "SELECT adminID AS userID, adminUsername AS username, adminFirstName AS firstName, adminLastName AS lastName, 'Admin' AS role FROM Administrator WHERE adminIsActive = 1";
+$query = "SELECT adminID AS userID, adminUsername AS username, adminFirstName AS firstName, adminLastName AS lastName, 'Admin' AS role FROM Administrator";
 $result = mysqli_query($conn, $query);
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
@@ -223,7 +275,7 @@ if ($result) {
     }
 }
 // ACTIVE SALES TEAM
-$query = "SELECT SalesID AS userID, salesUsername AS username, salesFirstName AS firstName, salesLastName AS lastName, 'Sales' AS role FROM SalesTeam WHERE salesIsActive = 1";
+$query = "SELECT SalesID AS userID, salesUsername AS username, salesFirstName AS firstName, salesLastName AS lastName, 'Sales' AS role FROM SalesTeam";
 $result = mysqli_query($conn, $query);
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
@@ -309,6 +361,9 @@ if ($result) {
             <!-- ACTIVE USERS TABLE !!! -->
             <div class="active-users-section">
                 <h3>Active Users</h3>
+                <?php if(!empty($deleteMessage)): ?>
+                    <?php echo $deleteMessage; ?>
+                <?php endif; ?>
                 <table>
                     <thead>
                         <tr>

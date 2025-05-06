@@ -22,9 +22,13 @@ $query = "SELECT c.clientID, c.clientFirstName, c.clientLastName, c.clientEmail,
            FROM Feedback f 
            JOIN ScheduleDiary sd ON f.feedbackID = sd.scheduleID 
            WHERE sd.clientID = c.clientID) AS lowestFeedback,
-          (SELECT COUNT(*) FROM ScheduleDiary sd2 
-           LEFT JOIN Payments p ON sd2.scheduleID = p.invoiceReference 
-           WHERE sd2.clientID = c.clientID AND (p.paymentIsPaid = 0 OR p.paymentID IS NULL)) AS unpaidCount
+          (SELECT EXISTS(SELECT 1 
+                        FROM Feedback f2 
+                        JOIN ScheduleDiary sd2 ON f2.feedbackID = sd2.scheduleID 
+                        WHERE sd2.clientID = c.clientID AND f2.feedbackRating <= 2)) AS hasBadFeedback,
+          (SELECT COUNT(*) FROM ScheduleDiary sd3 
+           LEFT JOIN Payments p ON sd3.scheduleID = p.invoiceReference 
+           WHERE sd3.clientID = c.clientID AND (p.paymentIsPaid = 0 OR p.paymentID IS NULL)) AS unpaidCount
           FROM Clients c";
 
 // Apply search filter
@@ -39,25 +43,32 @@ if ($filterBadFeedback) {
     } else {
         $query .= " WHERE";
     }
-    $query .= " (SELECT MIN(f.feedbackRating) 
+    $query .= " EXISTS (SELECT 1 
                 FROM Feedback f 
                 JOIN ScheduleDiary sd ON f.feedbackID = sd.scheduleID 
-                WHERE sd.clientID = c.clientID) <= 2";
+                WHERE sd.clientID = c.clientID AND f.feedbackRating <= 2)";
 }
 
 // Apply payment filter if requested
 if ($paymentFilter === 'paid' || $paymentFilter === 'unpaid') {
-    $isPaid = ($paymentFilter === 'paid') ? 1 : 0;
-    
     if ($search !== "" || $filterBadFeedback) {
         $query .= " AND";
     } else {
         $query .= " WHERE";
     }
     
-    $query .= " (SELECT COUNT(*) FROM ScheduleDiary sd2 
-                JOIN Payments p ON sd2.scheduleID = p.invoiceReference 
-                WHERE sd2.clientID = c.clientID AND p.paymentIsPaid = $isPaid) > 0";
+    if ($paymentFilter === 'paid') {
+        // For paid clients: those who have jobs and all are paid
+        $query .= " (SELECT COUNT(*) FROM ScheduleDiary sd2 WHERE sd2.clientID = c.clientID) > 0 
+                  AND (SELECT COUNT(*) FROM ScheduleDiary sd3 
+                       LEFT JOIN Payments p ON sd3.scheduleID = p.invoiceReference 
+                       WHERE sd3.clientID = c.clientID AND (p.paymentIsPaid = 0 OR p.paymentID IS NULL)) = 0";
+    } else {
+        // For unpaid clients: those who have at least one unpaid job
+        $query .= " (SELECT COUNT(*) FROM ScheduleDiary sd2 
+                     LEFT JOIN Payments p ON sd2.scheduleID = p.invoiceReference 
+                     WHERE sd2.clientID = c.clientID AND (p.paymentIsPaid = 0 OR p.paymentID IS NULL)) > 0";
+    }
 }
 
 $query .= " ORDER BY clientID ASC";
@@ -144,7 +155,7 @@ if ($result) {
                 <tbody>
                     <?php if (!empty($clients)): ?>
                         <?php foreach ($clients as $client): 
-                            $hasBadFeedback = !empty($client['lowestFeedback']) && $client['lowestFeedback'] <= 2;
+                            $hasBadFeedback = isset($client['hasBadFeedback']) && $client['hasBadFeedback'] == 1;
                         ?>
                             <tr class="<?php echo $hasBadFeedback ? 'bad-feedback' : ''; ?>">
                                 <td><?php echo htmlspecialchars($client['clientID']); ?></td>
@@ -208,6 +219,7 @@ if ($result) {
                 searchParams.set('badFeedback', '1');
             }
             
+            // Preserve other filters
             window.location.href = currentUrl.toString();
         }
         
@@ -219,6 +231,9 @@ if ($result) {
             if (searchParams.get('paymentFilter') === status) {
                 searchParams.delete('paymentFilter');
             } else {
+                // Remove any existing payment filter first
+                searchParams.delete('paymentFilter');
+                // Then set the new one
                 searchParams.set('paymentFilter', status);
             }
             

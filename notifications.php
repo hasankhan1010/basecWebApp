@@ -77,7 +77,7 @@ $apiKey = 'AIzaSyATOYFbuh6knVD6DmCPbpPwqxODprL9uCs';
 
   <!-- Google Maps JS API -->
   <script
-    src="https:// maps.googleapis.com/maps/api/js?key=<?= $apiKey ?>&callback=initMap"
+    src="https://maps.googleapis.com/maps/api/js?key=<?= $apiKey ?>&callback=initMap"
 ! - omg
     async defer>
   </script>

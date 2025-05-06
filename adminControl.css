@@ -173,15 +173,30 @@ footer {
   margin-top: 20px;
 }
 
-/* Message styling for CSV import */
+/* Message styling for user actions and CSV import */
+.message-container {
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 4px;
+  text-align: center;
+}
+
 .success-message {
   color: #2e7d32;
   font-weight: bold;
+  background-color: #e8f5e9;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 4px solid #2e7d32;
 }
 
 .error-message {
   color: #c62828;
   font-weight: bold;
+  background-color: #ffebee;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 4px solid #c62828;
 }
 
 .error-details {

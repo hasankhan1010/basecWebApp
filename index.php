@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </main>
   <footer>
-    <p>&copy; <?php echo date("Y"); ?> Your Company. All rights reserved.</p>
+    <p>&copy; <?php echo date("Y"); ?> BA Security. All rights reserved.</p>
   </footer>
   <script src="alerts.js"></script>
 </body>
