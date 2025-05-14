@@ -163,50 +163,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $scheduleJobType = 'Annual Service';
     }
     
-    // Check if there are any existing entries at the same time slot (for overwriting)!
-    if ($scheduleID == 0) { // Only check for new entries! - so cool
-        $checkQuery = "SELECT scheduleID FROM ScheduleDiary WHERE scheduleDate = ? AND 
-                      ((scheduleStartTime <= ? AND scheduleEndTime > ?) OR 
-                       (scheduleStartTime < ? AND scheduleEndTime >= ?))";
-        $checkStmt = $conn->prepare($checkQuery);
-        $checkStmt->bind_param("sssss", $scheduleDate, $scheduleEndTime, $scheduleStartTime, $scheduleEndTime, $scheduleStartTime);
-        $checkStmt->execute();
-        $checkResult = $checkStmt->get_result();
-        
-        if ($checkResult->num_rows > 0) {
-            // Get the first conflicting entry to overwrite!
-            $conflictRow = $checkResult->fetch_assoc();
-            $scheduleID = $conflictRow['scheduleID'];
-        }
-        
-        $checkStmt->close();
-    }
+    // We no longer check for existing entries at the same time slot
+    // This allows multiple entries to be added for different engineers working on different jobs
+    // for different clients at the same time slot
     
-    // Handle file upload!
-    if (isset($_FILES['scheduleFile']) && $_FILES['scheduleFile']['error'] === UPLOAD_ERR_OK) {
-        $fileName = basename($_FILES['scheduleFile']['name']);
-        $fileType = $_FILES['scheduleFile']['type'];
-        $fileSize = $_FILES['scheduleFile']['size'];
-        $targetDir = "uploads/";
-        
-        // Create directory if it doesn't exist! - love this part
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
-        
-        // Generate unique filename to prevent overwriting!
-        $uniqueFileName = time() . '_' . $fileName;
-        $targetFile = $targetDir . $uniqueFileName;
-        
-        // Move the uploaded file to the target directory!
-        if (move_uploaded_file($_FILES['scheduleFile']['tmp_name'], $targetFile)) {
-            // Insert file info into database!
-            $stmt = $conn->prepare("INSERT INTO ScheduleFiles (scheduleID, fileName, fileType, filePath, fileSize) VALUES (?, ?, ?, ?, ?)");
-            $stmt->bind_param("isssi", $scheduleID, $fileName, $fileType, $targetFile, $fileSize);
-            $stmt->execute();
-            $stmt->close();
-        }
-    }
+    // File uploads are now handled via AJAX in a separate request
+    // This allows for instantaneous uploads with immediate options for deleting, adding another file, and copying to client profile
     
     if ($scheduleID > 0) {
         // UPDATE THE EXISTING RECORD!
@@ -318,6 +280,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="scheduleDiaryAdd.css">
     <link rel="stylesheet" href="fileUpload.css">
     <link rel="stylesheet" href="darkmode.css">
+    <!-- Select2 CSS and JS for searchable dropdowns -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <style>
         /**
  * Toggle button styling
@@ -429,12 +395,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </select>
             
             <label for="clientID">Client:</label>
-            <select id="clientID" name="clientID" required>
+            <select id="clientID" name="clientID" class="searchable-select" required>
                 <option value="">-- Select Client --</option>
                 <?php foreach ($clients as $client): ?>
                     <option value="<?php echo $client['clientID']; ?>" 
-                        <?php if ($client['clientID'] == $clientID) echo "selected"; ?>>
-                        <?php echo htmlspecialchars($client['clientFirstName'] . " " . $client['clientLastName']); ?>
+                        <?php if ($client['clientID'] == $clientID) echo "selected"; ?>
+                        data-client-id="<?php echo $client['clientID']; ?>">
+                        <?php echo htmlspecialchars($client['clientFirstName'] . " " . $client['clientLastName']); ?> (ID: <?php echo $client['clientID']; ?>)
                     </option>
                 <?php endforeach; ?>
             </select>
@@ -476,31 +443,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ?></textarea>
             
             <?php if ($scheduleID > 0): ?>
-            <!-- File Upload Section -->
+            <!-- File Upload Section with AJAX support -->
             <fieldset class="schedule-files">
                 <legend>Schedule Files</legend>
-                <?php if (!empty($files)): ?>
-                    <ul class="file-list">
-                        <?php foreach ($files as $file): ?>
-                            <li>
-                                <div class="file-item">
-                                    <a href="<?php echo htmlspecialchars($file['filePath']); ?>" download class="file-link"><?php echo htmlspecialchars($file['fileName']); ?></a>
-                                    <span class="file-info"><?php echo date('Y-m-d H:i', strtotime($file['fileDateTime'])); ?> - <?php echo round($file['fileSize']/1024, 2); ?> KB</span>
-                                    <div class="file-actions">
-                                        <a href="deleteScheduleFile.php?fileID=<?php echo $file['fileID']; ?>&scheduleID=<?php echo $scheduleID; ?>" class="delete-file" onclick="return confirm('Are you sure you want to delete this file?');">Delete</a>
-                                        <a href="copyScheduleFileToClient.php?fileID=<?php echo $file['fileID']; ?>&scheduleID=<?php echo $scheduleID; ?>&clientID=<?php echo $clientID; ?>" class="copy-file">Copy to Client Profile</a>
+                <div id="file-list-container">
+                    <?php if (!empty($files)): ?>
+                        <ul class="file-list" id="file-list">
+                            <?php foreach ($files as $file): ?>
+                                <li id="file-item-<?php echo $file['fileID']; ?>">
+                                    <div class="file-item">
+                                        <a href="<?php echo htmlspecialchars($file['filePath']); ?>" download class="file-link"><?php echo htmlspecialchars($file['fileName']); ?></a>
+                                        <span class="file-info"><?php echo date('Y-m-d H:i', strtotime($file['fileDateTime'])); ?> - <?php echo round($file['fileSize']/1024, 2); ?> KB</span>
+                                        <div class="file-actions">
+                                            <button type="button" class="delete-file-btn" data-file-id="<?php echo $file['fileID']; ?>" data-schedule-id="<?php echo $scheduleID; ?>">Delete</button>
+                                            <button type="button" class="copy-file-btn" data-file-id="<?php echo $file['fileID']; ?>" data-schedule-id="<?php echo $scheduleID; ?>" data-client-id="<?php echo $clientID; ?>">Copy to Client Profile</button>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else: ?>
-                    <p>No files uploaded.</p>
-                <?php endif; ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p id="no-files-message">No files uploaded.</p>
+                    <?php endif; ?>
+                </div>
                 
                 <div class="file-upload-container">
-                    <label for="scheduleFile">Add File:</label>
-                    <input type="file" id="scheduleFile" name="scheduleFile">
+                    <div class="ajax-upload-container">
+                        <form id="ajax-file-upload-form" enctype="multipart/form-data">
+                            <input type="hidden" name="scheduleID" value="<?php echo $scheduleID; ?>">
+                            <label for="ajax-file-input" class="file-upload-label">Select File:</label>
+                            <input type="file" id="ajax-file-input" name="file" class="file-upload-input">
+                            <button type="button" id="upload-file-btn" class="upload-btn">Upload File</button>
+                        </form>
+                        <div id="upload-status" class="upload-status"></div>
+                    </div>
                 </div>
             </fieldset>
             <?php endif; ?>
@@ -552,14 +528,291 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
         
         // Initialize on page load!
-        document.addEventListener('DOMContentLoaded', function() {
-            const annualServiceCheckbox = document.getElementById('scheduleIsAnnualService');
-            if (annualServiceCheckbox.checked) {
-                toggleAnnualService(true);
-            } else {
-                toggleAnnualService(false);
+        $(document).ready(function() {
+            // Initialize Select2 for searchable client dropdown
+            $('#clientID').select2({
+                placeholder: 'Search for a client by name or ID',
+                allowClear: true,
+                width: '100%',
+                dropdownAutoWidth: true,
+                minimumInputLength: 1,
+                templateResult: formatClientOption,
+                templateSelection: formatClientOption
+            });
+            
+            // Apply dark mode compatible styles to Select2
+            applySelect2DarkModeStyles();
+            
+            // Handle dark mode toggle to update Select2 styles
+            $('#darkModeToggle').on('change', function() {
+                setTimeout(applySelect2DarkModeStyles, 100);
+            });
+            
+            // Format client options with highlighted search terms
+            function formatClientOption(client) {
+                if (!client.id) return client.text;
+                return $('<span>' + client.text + '</span>');
+            }
+            
+            // Apply dark mode compatible styles to Select2
+            function applySelect2DarkModeStyles() {
+                if (document.body.classList.contains('dark-mode')) {
+                    $('.select2-container--default .select2-selection--single').css({
+                        'background-color': '#333',
+                        'color': '#eee',
+                        'border-color': '#555'
+                    });
+                    $('.select2-container--default .select2-selection__rendered').css('color', '#eee');
+                    $('.select2-dropdown').css({
+                        'background-color': '#333',
+                        'color': '#eee',
+                        'border-color': '#555'
+                    });
+                    $('.select2-search__field').css({
+                        'background-color': '#444',
+                        'color': '#eee',
+                        'border-color': '#666'
+                    });
+                    $('.select2-results__option').css('color', '#eee');
+                    $('.select2-container--default .select2-results__option--highlighted[aria-selected]').css({
+                        'background-color': '#ffa500',
+                        'color': '#fff'
+                    });
+                } else {
+                    $('.select2-container--default .select2-selection--single').css({
+                        'background-color': '#fff',
+                        'color': '#333',
+                        'border-color': '#ccc'
+                    });
+                    $('.select2-container--default .select2-selection__rendered').css('color', '#333');
+                    $('.select2-dropdown').css({
+                        'background-color': '#fff',
+                        'color': '#333',
+                        'border-color': '#ccc'
+                    });
+                    $('.select2-search__field').css({
+                        'background-color': '#fff',
+                        'color': '#333',
+                        'border-color': '#ccc'
+                    });
+                    $('.select2-results__option').css('color', '#333');
+                    $('.select2-container--default .select2-results__option--highlighted[aria-selected]').css({
+                        'background-color': '#ffa500',
+                        'color': '#fff'
+                    });
+                }
             }
         });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const annualServiceCheckbox = document.getElementById('scheduleIsAnnualService');
+            if (annualServiceCheckbox && annualServiceCheckbox.checked) {
+                toggleAnnualService(true);
+            } else if (annualServiceCheckbox) {
+                toggleAnnualService(false);
+            }
+            
+            // AJAX file upload functionality
+            if (document.getElementById('upload-file-btn')) {
+                console.log('Setting up file upload handlers');
+                setupFileUploadHandlers();
+            }
+        });
+        
+        function setupFileUploadHandlers() {
+            // File upload button click handler
+            const uploadBtn = document.getElementById('upload-file-btn');
+            if (uploadBtn) {
+                console.log('Adding click handler to upload button');
+                uploadBtn.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent any default behavior
+                    console.log('Upload button clicked');
+                    
+                    const fileInput = document.getElementById('ajax-file-input');
+                    if (!fileInput || fileInput.files.length === 0) {
+                        showUploadStatus('Please select a file first', 'error');
+                        return;
+                    }
+                    
+                    console.log('File selected:', fileInput.files[0].name);
+                    const formData = new FormData();
+                    formData.append('file', fileInput.files[0]);
+                    formData.append('scheduleID', document.querySelector('input[name="scheduleID"]').value);
+                    
+                    uploadFile(formData);
+                });
+            } else {
+                console.error('Upload button not found');
+            }
+            
+            // Setup event delegation for delete and copy buttons
+            document.addEventListener('click', function(e) {
+                // Delete file button
+                if (e.target.classList.contains('delete-file-btn')) {
+                    const fileID = e.target.getAttribute('data-file-id');
+                    const scheduleID = e.target.getAttribute('data-schedule-id');
+                    if (confirm('Are you sure you want to delete this file?')) {
+                        deleteFile(fileID, scheduleID);
+                    }
+                }
+                
+                // Copy to client profile button
+                if (e.target.classList.contains('copy-file-btn')) {
+                    const fileID = e.target.getAttribute('data-file-id');
+                    const scheduleID = e.target.getAttribute('data-schedule-id');
+                    const clientID = e.target.getAttribute('data-client-id');
+                    copyFileToClient(fileID, scheduleID, clientID);
+                }
+            });
+        }
+        
+        function uploadFile(formData) {
+            showUploadStatus('Uploading...', 'info');
+            
+            // Debug - log form data contents
+            console.log('Form data being sent:');
+            for (let pair of formData.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+            
+            fetch('ajaxUploadScheduleFile.php', {
+                method: 'POST',
+                body: formData,
+                // Don't set Content-Type header, browser will set it with boundary for multipart/form-data
+                credentials: 'same-origin' // Include cookies in the request
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    showUploadStatus('File uploaded successfully!', 'success');
+                    addFileToList(data.file);
+                    // Clear the file input for another upload
+                    document.getElementById('ajax-file-input').value = '';
+                } else {
+                    showUploadStatus('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                showUploadStatus('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function deleteFile(fileID, scheduleID) {
+            const formData = new FormData();
+            formData.append('fileID', fileID);
+            formData.append('scheduleID', scheduleID);
+            
+            fetch('ajaxDeleteScheduleFile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the file item from the list
+                    const fileItem = document.getElementById('file-item-' + fileID);
+                    if (fileItem) {
+                        fileItem.remove();
+                        showUploadStatus('File deleted successfully!', 'success');
+                        
+                        // Check if there are any files left
+                        const fileList = document.getElementById('file-list');
+                        if (fileList && fileList.children.length === 0) {
+                            const container = document.getElementById('file-list-container');
+                            container.innerHTML = '<p id="no-files-message">No files uploaded.</p>';
+                        }
+                    }
+                } else {
+                    showUploadStatus('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showUploadStatus('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function copyFileToClient(fileID, scheduleID, clientID) {
+            showUploadStatus('Copying file to client profile...', 'info');
+            
+            const formData = new FormData();
+            formData.append('fileID', fileID);
+            formData.append('scheduleID', scheduleID);
+            formData.append('clientID', clientID);
+            
+            fetch('ajaxCopyScheduleFileToClient.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showUploadStatus('File copied to client profile successfully!', 'success');
+                } else {
+                    showUploadStatus('Error: ' + data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showUploadStatus('Error: ' + error.message, 'error');
+            });
+        }
+        
+        function addFileToList(file) {
+            const fileList = document.getElementById('file-list');
+            const noFilesMessage = document.getElementById('no-files-message');
+            
+            // Remove the 'no files' message if it exists
+            if (noFilesMessage) {
+                noFilesMessage.remove();
+            }
+            
+            // Create a new file list if it doesn't exist
+            if (!fileList) {
+                const container = document.getElementById('file-list-container');
+                container.innerHTML = '<ul class="file-list" id="file-list"></ul>';
+            }
+            
+            // Create the new file item HTML
+            const fileItem = document.createElement('li');
+            fileItem.id = 'file-item-' + file.fileID;
+            fileItem.innerHTML = `
+                <div class="file-item">
+                    <a href="${file.filePath}" download class="file-link">${file.fileName}</a>
+                    <span class="file-info">${file.fileDateTime} - ${file.fileSize} KB</span>
+                    <div class="file-actions">
+                        <button type="button" class="delete-file-btn" data-file-id="${file.fileID}" data-schedule-id="${file.scheduleID}">Delete</button>
+                        <button type="button" class="copy-file-btn" data-file-id="${file.fileID}" data-schedule-id="${file.scheduleID}" data-client-id="${file.clientID}">Copy to Client Profile</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add the new file item to the list
+            document.getElementById('file-list').appendChild(fileItem);
+        }
+        
+        function showUploadStatus(message, type) {
+            console.log('Status update:', type, message);
+            const statusElement = document.getElementById('upload-status');
+            if (!statusElement) {
+                console.error('Status element not found');
+                return;
+            }
+            
+            statusElement.textContent = message;
+            statusElement.className = 'upload-status ' + type;
+            
+            // Clear the status after 5 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusElement.textContent = '';
+                    statusElement.className = 'upload-status';
+                }, 5000);
+            }
+        }
     </script>
 </body>
 </html>

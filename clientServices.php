@@ -242,15 +242,12 @@ if ($result) {
         
         function clearAllFilters() {
             const currentUrl = new URL(window.location.href);
-            const searchParams = currentUrl.searchParams;
             
-            // Keep only the search parameter if it exists
-            const searchValue = searchParams.get('search');
+            // Clear all search parameters including the search input
             currentUrl.search = '';
             
-            if (searchValue) {
-                currentUrl.searchParams.set('search', searchValue);
-            }
+            // Also clear the search input field
+            document.querySelector('input[name="search"]').value = '';
             
             window.location.href = currentUrl.toString();
         }

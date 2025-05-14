@@ -237,18 +237,15 @@ $list = $conn->query($query)->fetch_all(MYSQLI_ASSOC);
   <link rel="stylesheet" href="reminders.css">
   <link rel="stylesheet" href="darkmode.css">
   <link rel="stylesheet" href="powerAlerts.css">
+  <!-- Select2 CSS and JS for searchable dropdowns -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar">
     <div class="nav-left">
-      <div class="dark-mode-toggle">
-        <label class="toggle-switch">
-          <input type="checkbox" id="darkModeToggle">
-          <span class="slider"></span>
-        </label>
-        <span class="toggle-label">Dark Mode</span>
-      </div>
       <a href="portal.php">Home</a>
       <a href="clientServices.php">Client Services</a>
       <a href="scheduleDiary.php">Schedule Diary</a>
@@ -266,7 +263,16 @@ $list = $conn->query($query)->fetch_all(MYSQLI_ASSOC);
   </nav>
 
   <div class="container">
-    <h1>Service Reminders</h1>
+    <div class="header-container">
+      <h1>Service Reminders</h1>
+      <div class="dark-mode-toggle">
+        <span class="toggle-label">Dark Mode</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="darkModeToggle">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
     <?php if ($success): ?>
       <div class="notification"><?= $success ?></div>
     <?php endif; ?>
@@ -281,11 +287,11 @@ $list = $conn->query($query)->fetch_all(MYSQLI_ASSOC);
         
         <div class="form-field">
           <label for="clientID">Client</label>
-          <select id="clientID" name="clientID" class="input-field">
+          <select id="clientID" name="clientID" class="input-field searchable-select">
             <option value="">-- Select Client (Optional) --</option>
             <?php foreach ($clients as $client): ?>
-              <option value="<?= $client['clientID'] ?>">
-                <?= htmlspecialchars($client['clientLastName'] . ', ' . $client['clientFirstName']) ?>
+              <option value="<?= $client['clientID'] ?>" data-client-id="<?= $client['clientID'] ?>">
+                <?= htmlspecialchars($client['clientLastName'] . ', ' . $client['clientFirstName']) ?> (ID: <?= $client['clientID'] ?>)
               </option>
             <?php endforeach; ?>
           </select>
@@ -409,6 +415,83 @@ $list = $conn->query($query)->fetch_all(MYSQLI_ASSOC);
   <!-- Reminder notifications are now handled by alerts.js -->
   
   <script>
+    // Initialize Select2 for searchable client dropdown
+    $(document).ready(function() {
+      // Initialize Select2 for searchable client dropdown
+      $('#clientID').select2({
+        placeholder: 'Search for a client by name or ID',
+        allowClear: true,
+        width: '100%',
+        dropdownAutoWidth: true,
+        minimumInputLength: 1,
+        templateResult: formatClientOption,
+        templateSelection: formatClientOption
+      });
+      
+      // Apply dark mode compatible styles to Select2
+      applySelect2DarkModeStyles();
+      
+      // Handle dark mode toggle to update Select2 styles
+      $('#darkModeToggle').on('change', function() {
+        setTimeout(applySelect2DarkModeStyles, 100);
+      });
+      
+      // Format client options with highlighted search terms
+      function formatClientOption(client) {
+        if (!client.id) return client.text;
+        return $('<span>' + client.text + '</span>');
+      }
+      
+      // Apply dark mode compatible styles to Select2
+      function applySelect2DarkModeStyles() {
+        if (document.body.classList.contains('dark-mode')) {
+          $('.select2-container--default .select2-selection--single').css({
+            'background-color': '#333',
+            'color': '#eee',
+            'border-color': '#555'
+          });
+          $('.select2-container--default .select2-selection__rendered').css('color', '#eee');
+          $('.select2-dropdown').css({
+            'background-color': '#333',
+            'color': '#eee',
+            'border-color': '#555'
+          });
+          $('.select2-search__field').css({
+            'background-color': '#444',
+            'color': '#eee',
+            'border-color': '#666'
+          });
+          $('.select2-results__option').css('color', '#eee');
+          $('.select2-container--default .select2-results__option--highlighted[aria-selected]').css({
+            'background-color': '#ffa500',
+            'color': '#fff'
+          });
+        } else {
+          $('.select2-container--default .select2-selection--single').css({
+            'background-color': '#fff',
+            'color': '#333',
+            'border-color': '#ccc'
+          });
+          $('.select2-container--default .select2-selection__rendered').css('color', '#333');
+          $('.select2-dropdown').css({
+            'background-color': '#fff',
+            'color': '#333',
+            'border-color': '#ccc'
+          });
+          $('.select2-search__field').css({
+            'background-color': '#fff',
+            'color': '#333',
+            'border-color': '#ccc'
+          });
+          $('.select2-results__option').css('color', '#333');
+          $('.select2-container--default .select2-results__option--highlighted[aria-selected]').css({
+            'background-color': '#ffa500',
+            'color': '#fff'
+          });
+        }
+      }
+    });
+    
     // Toggle functionality for annual service switch
     document.addEventListener('DOMContentLoaded', function() {
       const annualToggle = document.getElementById('isAnnual');

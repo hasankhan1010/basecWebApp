@@ -1,0 +1,129 @@
+2025-05-13 22:20:36 - Request received
+POST: Array
+(
+    [scheduleID] => 21
+)
+
+FILES: Array
+(
+    [file] => Array
+        (
+            [name] => CV _ Hasan Khan.pdf
+            [full_path] => CV _ Hasan Khan.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php2669.tmp
+            [error] => 0
+            [size] => 110037
+        )
+
+)
+
+File found in request: CV _ Hasan Khan.pdf
+File error code: 0
+Attempting to move file from C:\xampp\tmp\php2669.tmp to uploads/1747167636_CV _ Hasan Khan.pdf
+File moved successfully
+Database insert result: success
+Final response: Array
+(
+    [success] => 1
+    [message] => File uploaded successfully
+    [file] => Array
+        (
+            [fileID] => 5
+            [fileName] => CV _ Hasan Khan.pdf
+            [filePath] => uploads/1747167636_CV _ Hasan Khan.pdf
+            [fileSize] => 107.46
+            [fileDateTime] => 2025-05-13 22:20
+            [scheduleID] => 21
+            [clientID] => 10003
+        )
+
+)
+
+
+2025-05-13 22:20:51 - Request received
+POST: Array
+(
+    [scheduleID] => 21
+)
+
+FILES: Array
+(
+    [file] => Array
+        (
+            [name] => MOOSE MAN SCREENPLAY.odt
+            [full_path] => MOOSE MAN SCREENPLAY.odt
+            [type] => application/vnd.oasis.opendocument.text
+            [tmp_name] => C:\xampp\tmp\php5FAA.tmp
+            [error] => 0
+            [size] => 16175
+        )
+
+)
+
+File found in request: MOOSE MAN SCREENPLAY.odt
+File error code: 0
+Attempting to move file from C:\xampp\tmp\php5FAA.tmp to uploads/1747167651_MOOSE MAN SCREENPLAY.odt
+File moved successfully
+Database insert result: success
+Final response: Array
+(
+    [success] => 1
+    [message] => File uploaded successfully
+    [file] => Array
+        (
+            [fileID] => 6
+            [fileName] => MOOSE MAN SCREENPLAY.odt
+            [filePath] => uploads/1747167651_MOOSE MAN SCREENPLAY.odt
+            [fileSize] => 15.8
+            [fileDateTime] => 2025-05-13 22:20
+            [scheduleID] => 21
+            [clientID] => 10003
+        )
+
+)
+
+
+2025-05-13 22:21:34 - Request received
+POST: Array
+(
+    [scheduleID] => 22
+)
+
+FILES: Array
+(
+    [file] => Array
+        (
+            [name] => MOOSE MAN SCREENPLAY.odt
+            [full_path] => MOOSE MAN SCREENPLAY.odt
+            [type] => application/vnd.oasis.opendocument.text
+            [tmp_name] => C:\xampp\tmp\php91A.tmp
+            [error] => 0
+            [size] => 16175
+        )
+
+)
+
+File found in request: MOOSE MAN SCREENPLAY.odt
+File error code: 0
+Attempting to move file from C:\xampp\tmp\php91A.tmp to uploads/1747167694_MOOSE MAN SCREENPLAY.odt
+File moved successfully
+Database insert result: success
+Final response: Array
+(
+    [success] => 1
+    [message] => File uploaded successfully
+    [file] => Array
+        (
+            [fileID] => 7
+            [fileName] => MOOSE MAN SCREENPLAY.odt
+            [filePath] => uploads/1747167694_MOOSE MAN SCREENPLAY.odt
+            [fileSize] => 15.8
+            [fileDateTime] => 2025-05-13 22:21
+            [scheduleID] => 22
+            [clientID] => 10002
+        )
+
+)
+
+
